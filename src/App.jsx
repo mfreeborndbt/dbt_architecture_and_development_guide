@@ -9,8 +9,10 @@ export default function App() {
   return (
     <div className="min-h-screen bg-gray-50">
 
-      {/* Dark hero / page title */}
-      <div className="bg-gray-950 border-b border-gray-800">
+      {/* Hero / page title */}
+      <div className="bg-gradient-to-br from-gray-900 via-gray-950 to-emerald-950 border-b border-gray-800 relative overflow-hidden">
+        {/* Subtle radial glow */}
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_rgba(16,185,129,0.08)_0%,_transparent_60%)]" />
         <div className="section-container py-12 md:py-16 text-center">
           <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
             <h1 className="text-3xl md:text-4xl font-bold text-white mb-3 tracking-tight">

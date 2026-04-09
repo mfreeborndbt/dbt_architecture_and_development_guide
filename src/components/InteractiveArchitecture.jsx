@@ -50,7 +50,7 @@ export default function InteractiveArchitecture() {
             whileHover={{ scale: 1.03 }}
             className={`w-full px-6 py-2.5 rounded-xl transition-all duration-200 font-semibold text-sm ${
               activeFlow === 'overview'
-                ? 'bg-gray-900 text-white shadow-lg'
+                ? 'bg-gradient-to-r from-gray-900 via-gray-800 to-emerald-900 text-white shadow-lg'
                 : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-200 shadow-sm'
             }`}
           >
@@ -65,7 +65,7 @@ export default function InteractiveArchitecture() {
                 whileHover={{ scale: 1.03 }}
                 className={`flex-1 px-4 py-2.5 rounded-xl transition-all duration-200 font-semibold text-sm ${
                   activeFlow === flow.id
-                    ? 'bg-gray-900 text-white shadow-lg'
+                    ? 'bg-gradient-to-r from-gray-900 via-gray-800 to-emerald-900 text-white shadow-lg'
                     : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-200 shadow-sm'
                 }`}
               >

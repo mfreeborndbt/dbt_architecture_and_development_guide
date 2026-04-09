@@ -90,7 +90,7 @@ export default function EnvironmentsSection() {
               transition={{ duration: 0.4, delay: idx * 0.08 }}
               viewport={{ once: true }}
               onClick={() => setActive(isActive ? null : cat.id)}
-              className={`${p.bg} ${p.border} border-2 rounded-xl p-5 cursor-pointer select-none transition-all duration-200 ${isActive ? 'shadow-lg ring-2 ring-offset-2 ring-current' : 'hover:shadow-md'}`}
+              className={`${p.bg} ${p.border} border rounded-xl p-5 cursor-pointer select-none transition-all duration-200 ${isActive ? 'shadow-md ring-2 ring-offset-1 ring-current' : 'hover:shadow-sm'}`}
             >
               {/* Card header */}
               <div className="flex items-center gap-3 mb-3">
@@ -144,7 +144,7 @@ export default function EnvironmentsSection() {
         whileInView={{ opacity: 1 }}
         transition={{ duration: 0.5, delay: 0.4 }}
         viewport={{ once: true }}
-        className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm"
+        className="bg-white border border-gray-200/60 rounded-xl overflow-hidden"
       >
         {/* Header */}
         <div className="px-6 pt-5 pb-3 border-b border-gray-100">

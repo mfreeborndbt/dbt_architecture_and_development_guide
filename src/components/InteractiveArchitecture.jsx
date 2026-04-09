@@ -34,7 +34,7 @@ export default function InteractiveArchitecture() {
   ]
 
   return (
-    <section className="section-container py-10 md:py-14">
+    <section className="section-container py-6">
       <motion.div
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}
@@ -43,15 +43,15 @@ export default function InteractiveArchitecture() {
         className="flex flex-col items-center"
       >
         {/* Tab Navigation — Full Architecture on top, detail tabs below */}
-        <div className="flex flex-col items-center gap-2 mb-8 w-full max-w-md">
+        <div className="flex flex-col items-center gap-2 mb-6 w-full max-w-md">
           {/* Row 1: Full Architecture */}
           <motion.button
             onClick={() => setActiveFlow('overview')}
             whileHover={{ scale: 1.03 }}
-            className={`w-full px-6 py-2.5 rounded-xl transition-all font-semibold text-sm ${
+            className={`w-full px-6 py-2.5 rounded-xl transition-all duration-200 font-semibold text-sm ${
               activeFlow === 'overview'
-                ? 'bg-gradient-to-br from-green-500 to-emerald-600 text-white shadow-lg'
-                : 'bg-gray-100 text-gray-700 hover:bg-gray-200 border border-gray-300'
+                ? 'bg-gray-900 text-white shadow-lg'
+                : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-200 shadow-sm'
             }`}
           >
             Full Architecture
@@ -63,10 +63,10 @@ export default function InteractiveArchitecture() {
                 key={flow.id}
                 onClick={() => setActiveFlow(flow.id)}
                 whileHover={{ scale: 1.03 }}
-                className={`flex-1 px-4 py-2.5 rounded-xl transition-all font-semibold text-sm ${
+                className={`flex-1 px-4 py-2.5 rounded-xl transition-all duration-200 font-semibold text-sm ${
                   activeFlow === flow.id
-                    ? 'bg-gradient-to-br from-green-500 to-emerald-600 text-white shadow-lg'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200 border border-gray-300'
+                    ? 'bg-gray-900 text-white shadow-lg'
+                    : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-200 shadow-sm'
                 }`}
               >
                 {flow.label}
@@ -91,7 +91,7 @@ export default function InteractiveArchitecture() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.1 }}
-                className="bg-gradient-to-r from-orange-50 via-blue-50 to-green-50 border border-gray-200 rounded-2xl p-8"
+                className="bg-gradient-to-r from-gray-50 via-white to-gray-50 border border-gray-200/60 rounded-2xl p-8 shadow-sm"
               >
                 <div className="flex items-center justify-center gap-10">
                   {/* Git */}
@@ -99,7 +99,7 @@ export default function InteractiveArchitecture() {
                     <motion.div
                       whileHover={{ scale: 1.08 }}
                       transition={{ type: "spring", stiffness: 300, damping: 20 }}
-                      className="w-20 h-20 bg-blue-500 rounded-2xl flex items-center justify-center shadow-lg mb-4 cursor-pointer"
+                      className="w-20 h-20 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center shadow-md mb-4 cursor-pointer"
                     >
                       <GitBranch className="w-10 h-10 text-white" />
                     </motion.div>
@@ -124,7 +124,7 @@ export default function InteractiveArchitecture() {
                     <motion.div
                       whileHover={{ scale: 1.08 }}
                       transition={{ type: "spring", stiffness: 300, damping: 20 }}
-                      className="w-24 h-24 bg-gradient-to-br from-orange-500 to-red-500 rounded-2xl flex items-center justify-center shadow-lg mb-4 cursor-pointer"
+                      className="w-24 h-24 bg-gradient-to-br from-orange-500 to-orange-600 rounded-2xl flex items-center justify-center shadow-md mb-4 cursor-pointer"
                     >
                       <div className="text-2xl text-white font-bold">dbt</div>
                     </motion.div>
@@ -152,7 +152,7 @@ export default function InteractiveArchitecture() {
                     <motion.div
                       whileHover={{ scale: 1.08 }}
                       transition={{ type: "spring", stiffness: 300, damping: 20 }}
-                      className="w-20 h-20 bg-green-500 rounded-2xl flex items-center justify-center shadow-lg mb-4 cursor-pointer"
+                      className="w-20 h-20 bg-gradient-to-br from-green-500 to-green-600 rounded-2xl flex items-center justify-center shadow-md mb-4 cursor-pointer"
                     >
                       <Database className="w-10 h-10 text-white" />
                     </motion.div>
@@ -173,7 +173,7 @@ export default function InteractiveArchitecture() {
               transition={{ duration: 0.5 }}
               className="space-y-8"
             >
-              <div className="bg-gradient-to-br from-orange-50 to-blue-50 border-2 border-orange-300 rounded-2xl p-12">
+              <div className="bg-white border border-gray-200/60 rounded-2xl p-8 md:p-12 shadow-sm">
                 <h3 className="text-2xl font-bold text-gray-900 mb-8">Git ↔ dbt: Bidirectional Sync</h3>
 
                 <div className="space-y-8">
@@ -365,7 +365,7 @@ export default function InteractiveArchitecture() {
               className="space-y-8"
             >
               {/* Main horizontal flow: dbt → Warehouse */}
-              <div className="bg-gradient-to-br from-blue-50 to-green-50 border-2 border-blue-300 rounded-2xl p-12">
+              <div className="bg-white border border-gray-200/60 rounded-2xl p-8 md:p-12 shadow-sm">
                 <h3 className="text-2xl font-bold text-gray-900 mb-2">dbt Compilation & Execution</h3>
                 <p className="text-gray-600 mb-10">dbt converts your model into executable SQL, then sends it to your warehouse</p>
 
@@ -376,7 +376,7 @@ export default function InteractiveArchitecture() {
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 0.1 }}
-                    className="bg-gradient-to-br from-blue-100 to-cyan-100 border-2 border-blue-400 rounded-xl p-6"
+                    className="bg-gradient-to-br from-blue-50 to-blue-100/50 border border-blue-200/60 rounded-xl p-6"
                   >
                     <h4 className="text-sm font-bold text-blue-900 mb-4 uppercase tracking-wide">Inside dbt at runtime</h4>
 
@@ -447,7 +447,7 @@ export default function InteractiveArchitecture() {
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 0.2 }}
                     whileHover={{ scale: 1.08 }}
-                    className="bg-gradient-to-br from-green-100 to-emerald-100 border-2 border-green-400 rounded-xl p-6 cursor-pointer"
+                    className="bg-gradient-to-br from-green-50 to-green-100/50 border border-green-200/60 rounded-xl p-6 cursor-pointer"
                   >
                     <h4 className="text-sm font-bold text-green-900 mb-4 uppercase tracking-wide">Data Warehouse</h4>
 

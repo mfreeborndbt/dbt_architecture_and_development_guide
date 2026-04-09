@@ -78,7 +78,7 @@ export default function TypicalWorkflow() {
       </div>
 
       {/* Diagram */}
-      <div className="bg-gradient-to-r from-yellow-50 via-white to-green-50 border border-gray-200 rounded-xl p-5">
+      <div className="bg-gray-50/50 border border-gray-200/60 rounded-xl p-5">
         <WorkflowDiagram />
       </div>
 
@@ -91,7 +91,7 @@ export default function TypicalWorkflow() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.3 }}
-            className={`border rounded-lg p-3 ${s.color}`}
+            className={`border rounded-xl p-3 ${s.color} transition-all duration-200 hover:shadow-sm`}
           >
             <div className="flex items-center gap-2 mb-1.5">
               <span className={`w-5 h-5 rounded-full ${s.badge} text-white text-xs font-bold flex items-center justify-center shrink-0`}>

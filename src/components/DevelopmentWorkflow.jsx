@@ -1762,9 +1762,9 @@ const PHASES = [
 ]
 
 const PALETTE = {
-  blue:  { active: 'bg-blue-600 text-white',  inactive: 'bg-white text-blue-600 border border-blue-200 hover:bg-blue-50',  step: 'bg-blue-600 text-white',  stepInactive: 'bg-white text-blue-600 border border-blue-200 hover:bg-blue-50' },
-  amber: { active: 'bg-amber-500 text-white', inactive: 'bg-white text-amber-600 border border-amber-200 hover:bg-amber-50', step: 'bg-amber-500 text-white', stepInactive: 'bg-white text-amber-600 border border-amber-200 hover:bg-amber-50' },
-  green: { active: 'bg-green-600 text-white', inactive: 'bg-white text-green-600 border border-green-200 hover:bg-green-50', step: 'bg-green-600 text-white', stepInactive: 'bg-white text-green-600 border border-green-200 hover:bg-green-50' },
+  blue:  { active: 'bg-gray-900 text-white shadow-sm',  inactive: 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50 shadow-sm',  step: 'bg-gray-900 text-white',  stepInactive: 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50' },
+  amber: { active: 'bg-gray-900 text-white shadow-sm', inactive: 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50 shadow-sm', step: 'bg-gray-900 text-white', stepInactive: 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50' },
+  green: { active: 'bg-gray-900 text-white shadow-sm', inactive: 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50 shadow-sm', step: 'bg-gray-900 text-white', stepInactive: 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50' },
 }
 
 /* ─── Main export ─────────────────────────────────────────── */

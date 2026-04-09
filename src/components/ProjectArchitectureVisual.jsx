@@ -457,7 +457,7 @@ export default function ProjectArchitectureVisual() {
         whileInView={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.6 }}
         viewport={{ once: true }}
-        className="bg-white border-2 border-gray-300 rounded-lg p-6"
+        className="bg-white border border-gray-200/60 rounded-xl p-6 shadow-sm"
       >
         {/* Controls row */}
         <div className="flex flex-wrap items-center gap-3 mb-6">
@@ -467,7 +467,7 @@ export default function ProjectArchitectureVisual() {
               <button
                 key={m}
                 onClick={() => setViewMode(m)}
-                className={`px-4 py-1.5 transition-colors duration-150 ${
+                className={`px-4 py-1.5 transition-all duration-200 ${
                   viewMode === m
                     ? 'bg-gray-900 text-white'
                     : 'bg-white text-gray-500 hover:bg-gray-50'
@@ -488,10 +488,10 @@ export default function ProjectArchitectureVisual() {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab)}
-                className={`px-4 py-1.5 rounded-full text-sm font-semibold transition-all duration-200 border-2 ${
+                className={`px-4 py-1.5 rounded-full text-sm font-semibold transition-all duration-200 border ${
                   isActive
-                    ? `${tab.accent.tab} border-transparent shadow`
-                    : 'bg-white text-gray-600 border-gray-200 hover:border-gray-400'
+                    ? `${tab.accent.tab} border-transparent shadow-sm`
+                    : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300'
                 }`}
               >
                 {tab.label}

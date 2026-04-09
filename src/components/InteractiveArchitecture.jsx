@@ -108,14 +108,14 @@ export default function InteractiveArchitecture() {
                     <p className="text-sm text-gray-700 text-center">Source code</p>
                   </div>
 
-                  {/* One-Way Arrow: Git → dbt */}
+                  {/* Bidirectional Arrow: Git ↔ dbt */}
                   <div className="flex flex-col items-center justify-center shrink-0">
                     <motion.div
                       animate={{ x: [4, 10, 4] }}
                       transition={{ duration: 2, repeat: Infinity }}
                       className="text-4xl text-blue-600 font-bold"
                     >
-                      →
+                      ↔
                     </motion.div>
                   </div>
 

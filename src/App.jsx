@@ -16,10 +16,10 @@ export default function App() {
         <div className="section-container py-12 md:py-16 text-center">
           <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
             <h1 className="text-3xl md:text-4xl font-bold text-white mb-3 tracking-tight">
-              dbt Architecture &amp; Development Workflow
+              dbt Architecture &amp; Development Guide
             </h1>
             <p className="text-gray-400 text-sm max-w-2xl mx-auto leading-relaxed">
-              A guided walkthrough of how dbt connects Git, transformation logic, and your data platform — from a code change to production data.
+              A guided walkthrough of how dbt connects Git, transformation logic, and your data platform, from a code change to production data.
             </p>
           </motion.div>
         </div>

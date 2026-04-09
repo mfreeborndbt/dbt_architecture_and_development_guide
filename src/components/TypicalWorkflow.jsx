@@ -29,35 +29,26 @@ function WorkflowDiagram() {
         <g className="wf-node" style={{ transformOrigin: '221px 78px' }}>
           <rect x="164" y="64" width="114" height="28" rx="7" fill="#fef9c3" stroke="#ca8a04" strokeWidth="1.5" />
           <text x="221" y="82" textAnchor="middle" fontSize="10" fontWeight="700" fill="#92400e" fontFamily="ui-sans-serif,system-ui,sans-serif">Feature Branch</text>
-          <circle cx="164" cy="64" r="9" fill="#eab308" />
-          <text x="164" y="68" textAnchor="middle" fontSize="9" fontWeight="800" fill="white" fontFamily="ui-sans-serif,system-ui,sans-serif">1</text>
         </g>
 
         <g className="wf-node" style={{ transformOrigin: '338px 78px' }}>
           <rect x="288" y="64" width="100" height="28" rx="7" fill="#f3e8ff" stroke="#a855f7" strokeWidth="1.5" />
           <text x="338" y="82" textAnchor="middle" fontSize="10" fontWeight="700" fill="#7e22ce" fontFamily="ui-sans-serif,system-ui,sans-serif">Pull Request</text>
-          <circle cx="288" cy="64" r="9" fill="#a855f7" />
-          <text x="288" y="68" textAnchor="middle" fontSize="9" fontWeight="800" fill="white" fontFamily="ui-sans-serif,system-ui,sans-serif">2</text>
         </g>
 
         <g className="wf-node" style={{ transformOrigin: '431px 78px' }}>
           <rect x="398" y="64" width="66" height="28" rx="7" fill="#dbeafe" stroke="#3b82f6" strokeWidth="1.5" />
           <text x="431" y="82" textAnchor="middle" fontSize="10" fontWeight="700" fill="#1e40af" fontFamily="ui-sans-serif,system-ui,sans-serif">dbt CI</text>
-          <circle cx="398" cy="64" r="9" fill="#3b82f6" />
-          <text x="398" y="68" textAnchor="middle" fontSize="9" fontWeight="800" fill="white" fontFamily="ui-sans-serif,system-ui,sans-serif">3</text>
         </g>
 
         <g className="wf-node" style={{ transformOrigin: '524px 78px' }}>
           <rect x="474" y="64" width="100" height="28" rx="7" fill="#dbeafe" stroke="#3b82f6" strokeWidth="1.5" />
           <text x="524" y="82" textAnchor="middle" fontSize="10" fontWeight="700" fill="#1e40af" fontFamily="ui-sans-serif,system-ui,sans-serif">Peer Review</text>
-          <circle cx="474" cy="64" r="9" fill="#3b82f6" />
-          <text x="474" y="68" textAnchor="middle" fontSize="9" fontWeight="800" fill="white" fontFamily="ui-sans-serif,system-ui,sans-serif">4</text>
         </g>
 
         <g className="wf-node" style={{ transformOrigin: '605px 78px' }}>
           <circle cx="605" cy="78" r="20" fill="#dcfce7" stroke="#16a34a" strokeWidth="1.5" />
-          <text x="605" y="74" textAnchor="middle" fontSize="8" fontWeight="800" fill="#15803d" fontFamily="ui-sans-serif,system-ui,sans-serif">5</text>
-          <text x="605" y="86" textAnchor="middle" fontSize="8" fontWeight="700" fill="#16a34a" fontFamily="ui-sans-serif,system-ui,sans-serif">Merge!</text>
+          <text x="605" y="83" textAnchor="middle" fontSize="9" fontWeight="700" fill="#16a34a" fontFamily="ui-sans-serif,system-ui,sans-serif">Merge!</text>
         </g>
 
       </svg>

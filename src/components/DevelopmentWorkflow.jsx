@@ -497,39 +497,38 @@ function CreatePRPanel() {
 
 function PRDiagram() {
   return (
-    <svg viewBox="0 0 400 160" className="w-full max-w-sm mx-auto">
+    <svg viewBox="0 0 400 130" className="w-full max-w-sm mx-auto">
       {/* main line */}
-      <line x1="0" y1="130" x2="400" y2="130" stroke="#22c55e" strokeWidth="3" strokeLinecap="round" />
+      <line x1="0" y1="105" x2="400" y2="105" stroke="#22c55e" strokeWidth="3" strokeLinecap="round" />
 
       {/* feature branch line (dashed, going into main) */}
-      <line x1="0" y1="50" x2="240" y2="50" stroke="#6366f1" strokeWidth="3" strokeLinecap="round" strokeDasharray="6 4" />
+      <line x1="0" y1="35" x2="240" y2="35" stroke="#6366f1" strokeWidth="3" strokeLinecap="round" strokeDasharray="6 4" />
 
       {/* merge curve: feature → main */}
-      <path d="M 240 50 C 280 50 290 100 310 130" stroke="#6366f1" strokeWidth="3" fill="none" strokeLinecap="round" />
+      <path d="M 240 35 C 280 35 290 80 310 105" stroke="#6366f1" strokeWidth="3" fill="none" strokeLinecap="round" />
 
       {/* merge point dot on main */}
-      <circle cx="310" cy="130" r="7" fill="#6366f1" stroke="white" strokeWidth="2" />
-      <text x="305" y="134" fontSize="9" fontWeight="800" fill="white" fontFamily="ui-sans-serif, system-ui, sans-serif">✓</text>
+      <circle cx="310" cy="105" r="7" fill="#6366f1" stroke="white" strokeWidth="2" />
+      <text x="305" y="109" fontSize="9" fontWeight="800" fill="white" fontFamily="ui-sans-serif, system-ui, sans-serif">✓</text>
 
       {/* PR arrow label */}
-      <line x1="240" y1="50" x2="240" y2="90" stroke="#e5e7eb" strokeWidth="1" strokeDasharray="3 3" />
-      <rect x="170" y="62" width="70" height="22" rx="5" fill="#fef3c7" stroke="#f59e0b" strokeWidth="1.5" />
-      <text x="175" y="77" fontSize="9" fontWeight="600" fill="#92400e" fontFamily="ui-sans-serif, system-ui, sans-serif">Pull Request</text>
+      <rect x="170" y="44" width="70" height="20" rx="5" fill="#fef3c7" stroke="#f59e0b" strokeWidth="1.5" />
+      <text x="175" y="58" fontSize="9" fontWeight="600" fill="#92400e" fontFamily="ui-sans-serif, system-ui, sans-serif">Pull Request</text>
 
       {/* main node */}
-      <rect x="8" y="106" width="100" height="48" rx="10" fill="#f0fdf4" stroke="#22c55e" strokeWidth="2" />
-      <text x="22" y="126" fontSize="12" fontWeight="700" fill="#15803d" fontFamily="monospace">main</text>
-      <text x="22" y="144" fontSize="10" fill="#16a34a" fontFamily="ui-sans-serif, system-ui, sans-serif">protected</text>
+      <rect x="8" y="84" width="100" height="42" rx="10" fill="#f0fdf4" stroke="#22c55e" strokeWidth="2" />
+      <text x="22" y="102" fontSize="12" fontWeight="700" fill="#15803d" fontFamily="monospace">main</text>
+      <text x="22" y="118" fontSize="10" fill="#16a34a" fontFamily="ui-sans-serif, system-ui, sans-serif">protected</text>
 
       {/* feature node */}
-      <rect x="8" y="26" width="156" height="48" rx="10" fill="#eef2ff" stroke="#6366f1" strokeWidth="2" />
-      <text x="22" y="46" fontSize="11" fontWeight="700" fill="#4338ca" fontFamily="monospace">feature/new-model</text>
-      <text x="22" y="64" fontSize="10" fill="#6366f1" fontFamily="ui-sans-serif, system-ui, sans-serif">your branch</text>
+      <rect x="8" y="12" width="156" height="46" rx="10" fill="#eef2ff" stroke="#6366f1" strokeWidth="2" />
+      <text x="22" y="32" fontSize="11" fontWeight="700" fill="#4338ca" fontFamily="monospace">feature/new-model</text>
+      <text x="22" y="48" fontSize="10" fill="#6366f1" fontFamily="ui-sans-serif, system-ui, sans-serif">your branch</text>
 
       {/* merged label */}
-      <rect x="320" y="106" width="75" height="48" rx="10" fill="#f0fdf4" stroke="#22c55e" strokeWidth="2" />
-      <text x="332" y="126" fontSize="10" fontWeight="700" fill="#15803d" fontFamily="ui-sans-serif, system-ui, sans-serif">merged</text>
-      <text x="332" y="144" fontSize="10" fill="#16a34a" fontFamily="ui-sans-serif, system-ui, sans-serif">into main</text>
+      <rect x="320" y="84" width="75" height="42" rx="10" fill="#f0fdf4" stroke="#22c55e" strokeWidth="2" />
+      <text x="332" y="102" fontSize="10" fontWeight="700" fill="#15803d" fontFamily="ui-sans-serif, system-ui, sans-serif">merged</text>
+      <text x="332" y="118" fontSize="10" fill="#16a34a" fontFamily="ui-sans-serif, system-ui, sans-serif">into main</text>
     </svg>
   )
 }
@@ -548,7 +547,7 @@ function DevelopStep4() {
         </div>
       </div>
 
-      {/* Two-column layout — platform UI left, notes right */}
+      {/* Two-column layout — platform UI left, process right */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
         {/* Left — dbt Platform UI */}
@@ -557,23 +556,37 @@ function DevelopStep4() {
           <CreatePRPanel />
         </div>
 
-        {/* Right — concept + diagram */}
-        <div className="space-y-4">
+        {/* Right — full PR process */}
+        <div className="space-y-3">
           <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">What a PR does</p>
           <PRDiagram />
           <div className="space-y-2">
-            <div className="flex items-start gap-3 bg-indigo-50 border border-indigo-200 rounded-lg px-4 py-3">
-              <span className="text-lg mt-0.5">🔀</span>
+            <div className="flex items-start gap-3 bg-indigo-50 border border-indigo-200 rounded-lg px-3 py-2.5">
+              <span className="text-base mt-0.5">🔀</span>
               <div>
                 <p className="text-sm font-semibold text-indigo-800">Proposes merging your branch into main</p>
-                <p className="text-xs text-indigo-700 mt-0.5">Your feature branch stays intact until the PR is approved and merged. Nothing breaks main in the meantime.</p>
+                <p className="text-xs text-indigo-700 mt-0.5">Your feature branch stays intact until approved. Nothing breaks main in the meantime.</p>
               </div>
             </div>
-            <div className="flex items-start gap-3 bg-amber-50 border border-amber-200 rounded-lg px-4 py-3">
-              <span className="text-lg mt-0.5">✅</span>
+            <div className="flex items-start gap-3 bg-blue-50 border border-blue-200 rounded-lg px-3 py-2.5">
+              <span className="text-base mt-0.5">⚙️</span>
               <div>
-                <p className="text-sm font-semibold text-amber-800">Triggers automated QA checks</p>
-                <p className="text-xs text-amber-700 mt-0.5">Opening the PR starts the CI pipeline. dbt compiles, tests run, and results are reported back before any reviewer approves.</p>
+                <p className="text-sm font-semibold text-blue-800">Triggers dbt CI automatically</p>
+                <p className="text-xs text-blue-700 mt-0.5">dbt builds only changed models in an isolated QA schema, runs tests, and reports results back to the PR.</p>
+              </div>
+            </div>
+            <div className="flex items-start gap-3 bg-purple-50 border border-purple-200 rounded-lg px-3 py-2.5">
+              <span className="text-base mt-0.5">👀</span>
+              <div>
+                <p className="text-sm font-semibold text-purple-800">Enables peer review</p>
+                <p className="text-xs text-purple-700 mt-0.5">A teammate reviews logic and intent. CI catches syntax errors, but humans catch business logic mistakes.</p>
+              </div>
+            </div>
+            <div className="flex items-start gap-3 bg-green-50 border border-green-200 rounded-lg px-3 py-2.5">
+              <span className="text-base mt-0.5">✅</span>
+              <div>
+                <p className="text-sm font-semibold text-green-800">Merge when approved</p>
+                <p className="text-xs text-green-700 mt-0.5">Once CI passes and a reviewer approves, the branch merges to main. The next production job picks up the changes.</p>
               </div>
             </div>
           </div>

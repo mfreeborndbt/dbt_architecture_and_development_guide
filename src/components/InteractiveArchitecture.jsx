@@ -1,6 +1,160 @@
 import { useState, useEffect } from 'react'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import { GitBranch, Code2, Database, BarChart3, RefreshCw, ArrowRight, GitMerge } from 'lucide-react'
+
+const GIT_STEPS = [
+  {
+    num: 1, label: 'Pull from Git', color: 'orange',
+    title: 'Git Repository is Pulled into dbt',
+    desc: 'dbt syncs your code from Git',
+  },
+  {
+    num: 2, label: 'Write Code', color: 'blue',
+    title: 'Write SQL Models in dbt Studio',
+    desc: 'Developer creates a new transformation in the editor',
+  },
+  {
+    num: 3, label: 'Push to Git', color: 'green',
+    title: 'Changes Pushed Back to Git',
+    desc: 'dbt syncs your new code back to Git automatically',
+  },
+]
+
+function GitFlowStepped() {
+  const [step, setStep] = useState(0)
+  const COLORS = { orange: 'bg-orange-500', blue: 'bg-blue-500', green: 'bg-green-500' }
+  const ACTIVE_COLORS = { orange: 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-md', blue: 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-md', green: 'bg-gradient-to-r from-green-500 to-green-600 text-white shadow-md' }
+
+  return (
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }}>
+      <div className="bg-white border border-gray-200/60 rounded-2xl p-6 md:p-8 shadow-sm">
+        <h3 className="text-xl font-bold text-gray-900 mb-1">Git ↔ dbt: Bidirectional Sync</h3>
+        <p className="text-sm text-gray-500 mb-5">Pull from Git → Write code in dbt → Push back to Git → Repeat</p>
+
+        {/* Step buttons */}
+        <div className="flex gap-2 mb-6">
+          {GIT_STEPS.map((s, i) => (
+            <button
+              key={i}
+              onClick={() => setStep(i)}
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 ${
+                step === i
+                  ? ACTIVE_COLORS[s.color]
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              }`}
+            >
+              <span className={`w-5 h-5 rounded-full text-white text-xs font-bold flex items-center justify-center shrink-0 ${step === i ? 'bg-white/30' : COLORS[s.color]}`}>
+                {s.num}
+              </span>
+              {s.label}
+            </button>
+          ))}
+        </div>
+
+        {/* Step content */}
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={step}
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.2 }}
+          >
+            <h4 className="text-lg font-bold text-gray-900 mb-1">{GIT_STEPS[step].title}</h4>
+            <p className="text-sm text-gray-500 mb-4">{GIT_STEPS[step].desc}</p>
+
+            {/* Step 1: Pull */}
+            {step === 0 && (
+              <div className="space-y-4">
+                <div className="flex items-center gap-4">
+                  <GitBranch className="w-7 h-7 text-orange-600" />
+                  <motion.span animate={{ x: [0, 6, 0] }} transition={{ duration: 1.5, repeat: Infinity }} className="text-2xl text-orange-400 font-bold">→</motion.span>
+                  <div className="bg-gradient-to-br from-orange-400 to-orange-600 text-white px-3 py-1.5 rounded-lg font-bold text-sm">dbt</div>
+                </div>
+                <div className="bg-gray-50 rounded-lg p-4 border border-gray-200 font-mono text-sm text-gray-700">
+                  <p>📁 my-dbt-project/</p>
+                  <p className="ml-4">📁 models/</p>
+                  <p className="ml-8">📁 01_staging/</p>
+                  <p className="ml-12">📄 stg_customers.sql</p>
+                  <p className="ml-12">📄 stg_orders.sql</p>
+                  <p className="ml-8">📁 02_int/</p>
+                  <p className="ml-12">📄 int_orders_with_items.sql</p>
+                  <p className="ml-8">📁 03_mart/</p>
+                  <p className="ml-12">📄 fct_orders.sql</p>
+                  <p className="ml-4">📁 tests/</p>
+                  <p className="ml-4">📄 dbt_project.yml</p>
+                </div>
+              </div>
+            )}
+
+            {/* Step 2: Write */}
+            {step === 1 && (
+              <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
+                <div className="bg-gray-50 border-b border-gray-200 px-4 py-2.5 flex items-center gap-2 text-sm">
+                  <span className="text-gray-600">📄 int_customers_by_region.sql</span>
+                  <span className="text-gray-400">×</span>
+                </div>
+                <div className="flex">
+                  <div className="w-64 bg-gray-50 border-r border-gray-200 p-4 text-xs font-mono text-gray-600">
+                    <div className="font-bold mb-3">models/</div>
+                    <div>📁 01_staging/</div>
+                    <div className="ml-4">📄 stg_customers.sql</div>
+                    <div className="ml-4">📄 stg_orders.sql</div>
+                    <div className="mt-1.5">📁 02_int/</div>
+                    <div className="ml-4 bg-blue-100 px-2 py-0.5 rounded border-l-2 border-blue-500 font-bold text-blue-800">📄 int_customers_by_region.sql</div>
+                    <div className="ml-4 py-0.5">📄 int_orders_with_items.sql</div>
+                    <div className="mt-1.5">📁 03_mart/</div>
+                    <div className="ml-4">📄 fct_orders.sql</div>
+                  </div>
+                  <div className="flex-1 p-5">
+                    <div className="font-mono text-xs space-y-1 text-gray-800">
+                      <div><span className="text-orange-600">{`{{`}</span> <span className="text-purple-600">config</span><span className="text-orange-600">(</span><span className="text-green-600">materialized</span>=<span className="text-blue-600">'table'</span><span className="text-orange-600">)</span> <span className="text-orange-600">{`}}`}</span></div>
+                      <div className="h-2" />
+                      <div><span className="text-blue-600">select</span></div>
+                      <div className="ml-4">c.customer_id,</div>
+                      <div className="ml-4">c.customer_name,</div>
+                      <div className="ml-4">r.region,</div>
+                      <div className="ml-4"><span className="text-blue-600">count</span>(o.order_id) <span className="text-blue-600">as</span> total_orders</div>
+                      <div><span className="text-blue-600">from</span> <span className="text-orange-600">{`{{`}</span> <span className="text-purple-600">ref</span>(<span className="text-green-600">'stg_customers'</span>) <span className="text-orange-600">{`}}`}</span> c</div>
+                      <div><span className="text-blue-600">left join</span> <span className="text-orange-600">{`{{`}</span> <span className="text-purple-600">ref</span>(<span className="text-green-600">'stg_orders'</span>) <span className="text-orange-600">{`}}`}</span> o <span className="text-blue-600">on</span> c.customer_id = o.customer_id</div>
+                      <div><span className="text-blue-600">left join</span> region r <span className="text-blue-600">on</span> c.region_id = r.region_id</div>
+                      <div><span className="text-blue-600">group by</span> 1, 2, 3</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Step 3: Push */}
+            {step === 2 && (
+              <div className="space-y-4">
+                <div className="flex items-center gap-4">
+                  <div className="bg-gradient-to-br from-orange-400 to-orange-600 text-white px-3 py-1.5 rounded-lg font-bold text-sm">dbt</div>
+                  <motion.span animate={{ x: [0, 6, 0] }} transition={{ duration: 1.5, repeat: Infinity }} className="text-2xl text-green-500 font-bold">→</motion.span>
+                  <GitBranch className="w-7 h-7 text-orange-600" />
+                </div>
+                <div className="bg-gray-50 rounded-lg p-4 border border-gray-200 font-mono text-sm text-gray-700">
+                  <p>📁 my-dbt-project/</p>
+                  <p className="ml-4">📁 models/</p>
+                  <p className="ml-8">📁 01_staging/</p>
+                  <p className="ml-12">📄 stg_customers.sql</p>
+                  <p className="ml-12">📄 stg_orders.sql</p>
+                  <p className="ml-8">📁 02_int/</p>
+                  <p className="ml-12 text-green-600 font-bold">📄 int_customers_by_region.sql ✨ NEW</p>
+                  <p className="ml-12">📄 int_orders_with_items.sql</p>
+                  <p className="ml-8">📁 03_mart/</p>
+                  <p className="ml-12">📄 fct_orders.sql</p>
+                  <p className="ml-4">📁 tests/</p>
+                  <p className="ml-4">📄 dbt_project.yml</p>
+                </div>
+              </div>
+            )}
+          </motion.div>
+        </AnimatePresence>
+      </div>
+    </motion.div>
+  )
+}
 
 export default function InteractiveArchitecture() {
   const [activeFlow, setActiveFlow] = useState('overview')
@@ -165,195 +319,9 @@ export default function InteractiveArchitecture() {
             </motion.div>
           )}
 
-          {/* Git ↔ dbt Detailed Flow */}
+          {/* Git ↔ dbt Detailed Flow — stepped */}
           {activeFlow === 'git-flow' && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.5 }}
-              className="space-y-8"
-            >
-              <div className="bg-white border border-gray-200/60 rounded-2xl p-8 md:p-12 shadow-sm">
-                <h3 className="text-2xl font-bold text-gray-900 mb-8">Git ↔ dbt: Bidirectional Sync</h3>
-
-                <div className="space-y-8">
-                  {/* Step 1: Pull from Git */}
-                  <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.1 }}
-                    className="flex gap-6"
-                  >
-                    <div className="flex-shrink-0 w-12 h-12 rounded-full bg-orange-500 text-white flex items-center justify-center font-bold text-lg flex-shrink-0">
-                      1
-                    </div>
-                    <div className="flex-1">
-                      <h4 className="text-xl font-bold text-gray-900 mb-4">Git Repository is Pulled into dbt</h4>
-                      <p className="text-gray-700 mb-4">dbt syncs your code from Git</p>
-
-                      {/* Visual: Git → dbt arrow with actual icons */}
-                      <motion.div
-                        animate={{ x: [0, 8, 0] }}
-                        transition={{ duration: 2, repeat: Infinity }}
-                        className="mb-4 flex items-center gap-6"
-                      >
-                        <div className="text-3xl">
-                          <GitBranch className="w-8 h-8 text-orange-600" />
-                        </div>
-                        <div className="text-2xl text-orange-400 font-bold">→</div>
-                        <div className="text-3xl bg-gradient-to-br from-orange-400 to-orange-600 text-white px-2 py-2 rounded-lg font-bold">
-                          dbt
-                        </div>
-                      </motion.div>
-
-                      <div className="bg-white rounded-lg p-4 border border-orange-300 font-mono text-sm">
-                        <div className="text-orange-900">
-                          <p>📁 my-dbt-project/</p>
-                          <p className="ml-4">📁 models/</p>
-                          <p className="ml-8">📁 01_staging/</p>
-                          <p className="ml-12">📄 stg_customers.sql</p>
-                          <p className="ml-12">📄 stg_orders.sql</p>
-                          <p className="ml-8">📁 02_int/</p>
-                          <p className="ml-12">📄 int_orders_with_items.sql</p>
-                          <p className="ml-8">📁 03_mart/</p>
-                          <p className="ml-12">📄 fct_orders.sql</p>
-                          <p className="ml-4">📁 tests/</p>
-                          <p className="ml-4">📄 dbt_project.yml</p>
-                        </div>
-                      </div>
-                    </div>
-                  </motion.div>
-
-                  {/* Step 2: New Features Added - dbt Studio UI */}
-                  <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.25 }}
-                    className="flex gap-6"
-                  >
-                    <div className="flex-shrink-0 w-12 h-12 rounded-full bg-blue-500 text-white flex items-center justify-center font-bold text-lg flex-shrink-0">
-                      2
-                    </div>
-                    <div className="flex-1">
-                      <h4 className="text-xl font-bold text-gray-900 mb-4">Write SQL Models in dbt Studio</h4>
-                      <p className="text-gray-700 mb-4">Developer creates a new transformation in the editor</p>
-
-                      {/* dbt Studio Mock UI */}
-                      <div className="bg-white border border-blue-300 rounded-lg overflow-hidden">
-                        {/* Header */}
-                        <div className="bg-gray-100 border-b border-gray-300 px-4 py-3 flex items-center gap-2 text-sm">
-                          <span className="text-gray-600">📁 int_customers_by_region.sql</span>
-                          <span className="text-gray-400">×</span>
-                        </div>
-
-                        {/* Editor Area */}
-                        <div className="flex">
-                          {/* Left Sidebar - File Tree */}
-                          <div className="w-80 bg-gray-50 border-r border-gray-300 p-4 text-xs font-mono">
-                            <div className="text-gray-600 font-bold mb-4">models/</div>
-                            <div className="space-y-0 text-gray-700">
-                              <div>📁 01_staging/</div>
-                              <div className="ml-5">📄 stg_customers.sql</div>
-                              <div className="ml-5">📄 stg_orders.sql</div>
-                              <div className="mt-2">📁 02_int/</div>
-                              <div className="ml-5 bg-blue-200 px-2 py-1 rounded border-l-4 border-blue-600 font-bold text-blue-900">
-                                📄 int_customers_by_region.sql
-                              </div>
-                              <div className="ml-5 px-2 py-1">📄 int_orders_with_items.sql</div>
-                              <div className="mt-2">📁 03_mart/</div>
-                              <div className="ml-5">📄 fct_orders.sql</div>
-                            </div>
-                          </div>
-
-                          {/* Right Side - Code Editor */}
-                          <div className="flex-1 p-6 bg-white">
-                            <div className="font-mono text-xs space-y-1 text-gray-800">
-                              <div><span className="text-orange-600">{`{{`}</span> <span className="text-purple-600">config</span><span className="text-orange-600">(</span><span className="text-green-600">materialized</span>=<span className="text-blue-600">'table'</span><span className="text-orange-600">)</span> <span className="text-orange-600">{`}}`}</span></div>
-                              <div></div>
-                              <div><span className="text-blue-600">select</span></div>
-                              <div className="ml-4">c.customer_id,</div>
-                              <div className="ml-4">c.customer_name,</div>
-                              <div className="ml-4">r.region,</div>
-                              <div className="ml-4"><span className="text-blue-600">count</span>(o.order_id) <span className="text-blue-600">as</span> total_orders</div>
-                              <div><span className="text-blue-600">from</span> <span className="text-orange-600">{`{{`}</span> <span className="text-purple-600">ref</span>(<span className="text-green-600">'stg_customers'</span>) <span className="text-orange-600">{`}}`}</span> c</div>
-                              <div><span className="text-blue-600">left join</span> <span className="text-orange-600">{`{{`}</span> <span className="text-purple-600">ref</span>(<span className="text-green-600">'stg_orders'</span>) <span className="text-orange-600">{`}}`}</span> o <span className="text-blue-600">on</span> c.customer_id = o.customer_id</div>
-                              <div><span className="text-blue-600">left join</span> region r <span className="text-blue-600">on</span> c.region_id = r.region_id</div>
-                              <div><span className="text-blue-600">group by</span> 1, 2, 3</div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </motion.div>
-
-                  {/* Step 3: Push Back to Git */}
-                  <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.4 }}
-                    className="flex gap-6"
-                  >
-                    <div className="flex-shrink-0 w-12 h-12 rounded-full bg-green-500 text-white flex items-center justify-center font-bold text-lg flex-shrink-0">
-                      3
-                    </div>
-                    <div className="flex-1">
-                      <h4 className="text-xl font-bold text-gray-900 mb-4">Changes Pushed Back to Git</h4>
-                      <p className="text-gray-700 mb-4">dbt syncs your new code back to Git automatically</p>
-
-                      {/* Visual: dbt → Git arrow with actual icons */}
-                      <motion.div
-                        animate={{ x: [0, -8, 0] }}
-                        transition={{ duration: 2, repeat: Infinity, delay: 0.3 }}
-                        className="mb-4 flex items-center gap-6"
-                      >
-                        <div className="text-3xl bg-gradient-to-br from-orange-400 to-orange-600 text-white px-2 py-2 rounded-lg font-bold">
-                          dbt
-                        </div>
-                        <div className="text-2xl text-green-500 font-bold">→</div>
-                        <div className="text-3xl">
-                          <GitBranch className="w-8 h-8 text-orange-600" />
-                        </div>
-                      </motion.div>
-
-                      <div className="bg-white rounded-lg p-4 border border-green-300 font-mono text-sm">
-                        <div className="text-green-900">
-                          <p>📁 my-dbt-project/</p>
-                          <p className="ml-4">📁 models/</p>
-                          <p className="ml-8">📁 01_staging/</p>
-                          <p className="ml-12">📄 stg_customers.sql</p>
-                          <p className="ml-12">📄 stg_orders.sql</p>
-                          <p className="ml-8">📁 02_int/</p>
-                          <p className="ml-12 text-green-600 font-bold">📄 int_customers_by_region.sql ✨ NEW</p>
-                          <p className="ml-12">📄 int_orders_with_items.sql</p>
-                          <p className="ml-8">📁 03_mart/</p>
-                          <p className="ml-12">📄 fct_orders.sql</p>
-                          <p className="ml-4">📁 tests/</p>
-                          <p className="ml-4">📄 dbt_project.yml</p>
-                        </div>
-                      </div>
-                    </div>
-                  </motion.div>
-
-                  {/* Cycle */}
-                  <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.55 }}
-                    className="flex gap-6"
-                  >
-                    <div className="flex-shrink-0 w-12 h-12 rounded-full bg-purple-500 text-white flex items-center justify-center font-bold text-lg flex-shrink-0">
-                      ↻
-                    </div>
-                    <div className="flex-1">
-                      <h4 className="text-xl font-bold text-gray-900 mb-2">Continuous Cycle</h4>
-                      <p className="text-gray-700">
-                        Pull from Git → Write code in dbt → Push back to Git → Repeat. This bidirectional sync keeps your code and dbt in perfect harmony.
-                      </p>
-                    </div>
-                  </motion.div>
-                </div>
-              </div>
-            </motion.div>
+            <GitFlowStepped />
           )}
 
           {/* Compilation & Execution Flow */}

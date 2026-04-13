@@ -1,12 +1,12 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 
-// Architecture & Setup components (from dbt-story)
+// Architecture & Setup components
 import InteractiveArchitecture from './components/InteractiveArchitecture'
 import EnvironmentsSection from './components/EnvironmentsSection'
 import ProjectArchitectureVisual from './components/ProjectArchitectureVisual'
 
-// Development Workflow components (from dbt-story)
+// Development Workflow components
 import TypicalWorkflow from './components/TypicalWorkflow'
 import DevelopmentWorkflow from './components/DevelopmentWorkflow'
 

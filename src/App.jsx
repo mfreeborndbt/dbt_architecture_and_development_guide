@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 
-// Architecture & Setup components
+// Architecture & Environments components
 import InteractiveArchitecture from './components/InteractiveArchitecture'
 import EnvironmentsSection from './components/EnvironmentsSection'
 import ProjectArchitectureVisual from './components/ProjectArchitectureVisual'
@@ -23,7 +23,7 @@ import DbtBuildSimulator from './components/DbtBuildSimulator'
 import StateAwareOrchestration from './components/StateAwareOrchestration'
 
 const topTabs = [
-  { key: 'architecture', label: 'dbt Architecture & Setup' },
+  { key: 'architecture', label: 'Architecture & Environments' },
   { key: 'models', label: 'dbt Models' },
   { key: 'development', label: 'dbt Development Workflow' },
   { key: 'orchestration', label: 'dbt Orchestration' },

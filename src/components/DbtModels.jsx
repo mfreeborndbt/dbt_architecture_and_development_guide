@@ -610,31 +610,41 @@ function LineageVisual({ showDbt }) {
     <div className="space-y-4">
       {/* Model lineage DAG */}
       <div className="bg-white border border-gray-200 rounded-lg p-4">
-        <p className="text-emerald-700 text-xs font-semibold mb-2">Model Lineage (auto-generated)</p>
+        <p className="text-gray-700 text-xs font-semibold mb-2">Model Lineage (auto-generated)</p>
         <div className="flex justify-center">
-          <svg width="420" height="120" viewBox="0 0 420 120">
+          <svg width="560" height="120" viewBox="0 0 560 120">
             {/* Sources */}
             <DagNode x={0} y={10} label="src_orders" color="#6366f1" />
             <DagNode x={0} y={60} label="src_customers" color="#6366f1" />
             {/* Staging */}
             <DagNode x={150} y={10} label="stg_orders" color="#10b981" />
             <DagNode x={150} y={60} label="stg_customers" color="#10b981" />
+            {/* Intermediate */}
+            <DagNode x={300} y={35} label="int_order_items" color="#f59e0b" />
             {/* Mart */}
-            <DagNode x={300} y={35} label="fct_orders" color="#f59e0b" />
-            {/* Edges */}
+            <DagNode x={440} y={35} label="fct_orders" color="#f97316" />
+            {/* Edges: src to stg */}
             <DagEdge x1={120} y1={26} x2={150} y2={26} color="#6366f1" />
             <DagEdge x1={120} y1={76} x2={150} y2={76} color="#6366f1" />
+            {/* Edges: stg to int */}
             <DagEdge x1={270} y1={26} x2={300} y2={51} color="#10b981" />
             <DagEdge x1={270} y1={76} x2={300} y2={51} color="#10b981" />
+            {/* Edge: int to mart */}
+            <DagEdge x1={420} y1={51} x2={440} y2={51} color="#f59e0b" />
+            {/* Layer labels */}
+            <text x={60} y={105} textAnchor="middle" fontSize="8" fill="#9ca3af" fontWeight="500">Sources</text>
+            <text x={210} y={105} textAnchor="middle" fontSize="8" fill="#9ca3af" fontWeight="500">Staging</text>
+            <text x={360} y={105} textAnchor="middle" fontSize="8" fill="#9ca3af" fontWeight="500">Intermediate</text>
+            <text x={500} y={105} textAnchor="middle" fontSize="8" fill="#9ca3af" fontWeight="500">Marts</text>
           </svg>
         </div>
       </div>
       {/* Column lineage */}
       <div className="bg-white border border-gray-200 rounded-lg p-4">
-        <p className="text-emerald-700 text-xs font-semibold mb-2">Column-level Lineage</p>
+        <p className="text-gray-700 text-xs font-semibold mb-2">Column-level Lineage</p>
         <div className="flex items-center justify-center gap-3 text-[10px] font-mono">
           <div className="flex flex-col items-center gap-1">
-            <span className="bg-emerald-100 text-emerald-700 text-[8px] font-bold px-1.5 py-0.5 rounded-full uppercase tracking-wide">Raw</span>
+            <span className="bg-indigo-100 text-indigo-700 text-[8px] font-bold px-1.5 py-0.5 rounded-full uppercase tracking-wide">Raw</span>
             <div className="bg-indigo-50 border border-indigo-200 rounded px-3 py-2 text-indigo-700">
               <p className="font-semibold mb-1">src_orders</p>
               <p>order_total</p>
@@ -642,7 +652,7 @@ function LineageVisual({ showDbt }) {
           </div>
           <span className="text-gray-400 mt-4">-&gt;</span>
           <div className="flex flex-col items-center gap-1">
-            <span className="bg-purple-100 text-purple-700 text-[8px] font-bold px-1.5 py-0.5 rounded-full uppercase tracking-wide">Rename</span>
+            <span className="bg-emerald-100 text-emerald-700 text-[8px] font-bold px-1.5 py-0.5 rounded-full uppercase tracking-wide">Rename</span>
             <div className="bg-emerald-50 border border-emerald-200 rounded px-3 py-2 text-emerald-700">
               <p className="font-semibold mb-1">stg_orders</p>
               <p>amount</p>
@@ -658,8 +668,8 @@ function LineageVisual({ showDbt }) {
           </div>
           <span className="text-gray-400 mt-4">-&gt;</span>
           <div className="flex flex-col items-center gap-1">
-            <span className="bg-blue-100 text-blue-700 text-[8px] font-bold px-1.5 py-0.5 rounded-full uppercase tracking-wide">Passthrough</span>
-            <div className="bg-amber-50 border border-amber-200 rounded px-3 py-2 text-amber-700">
+            <span className="bg-orange-100 text-orange-700 text-[8px] font-bold px-1.5 py-0.5 rounded-full uppercase tracking-wide">Passthrough</span>
+            <div className="bg-orange-50 border border-orange-200 rounded px-3 py-2 text-orange-700">
               <p className="font-semibold mb-1">fct_orders</p>
               <p>revenue</p>
             </div>

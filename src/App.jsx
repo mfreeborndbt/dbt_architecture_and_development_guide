@@ -10,6 +10,9 @@ import ProjectArchitectureVisual from './components/ProjectArchitectureVisual'
 import TypicalWorkflow from './components/TypicalWorkflow'
 import DevelopmentWorkflow from './components/DevelopmentWorkflow'
 
+// Models components
+import DbtModels from './components/DbtModels'
+
 // Orchestration components
 import PreDbtOrchestration from './components/PreDbtOrchestration'
 import HowDbtWorks from './components/HowDbtWorks'
@@ -21,6 +24,7 @@ import StateAwareOrchestration from './components/StateAwareOrchestration'
 
 const topTabs = [
   { key: 'architecture', label: 'dbt Architecture & Setup' },
+  { key: 'models', label: 'dbt Models' },
   { key: 'development', label: 'dbt Development Workflow' },
   { key: 'orchestration', label: 'dbt Orchestration' },
 ]
@@ -236,6 +240,7 @@ function OrchestrationPage() {
 
 const tabDescriptions = {
   architecture: 'How dbt connects Git, transformation logic, and your data platform.',
+  models: 'What dbt models offer and why they change how you build data pipelines.',
   development: 'The end-to-end workflow from feature branch to production deployment.',
   orchestration: 'How dbt orchestration makes data pipelines simpler, faster, and cheaper.',
 }
@@ -293,6 +298,11 @@ export default function App() {
         {activeTab === 'architecture' && (
           <motion.div key="arch" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.3 }}>
             <ArchitecturePage />
+          </motion.div>
+        )}
+        {activeTab === 'models' && (
+          <motion.div key="models" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.3 }}>
+            <DbtModels />
           </motion.div>
         )}
         {activeTab === 'development' && (

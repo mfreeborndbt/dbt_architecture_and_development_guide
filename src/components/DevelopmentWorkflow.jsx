@@ -87,6 +87,8 @@ function FileTree() {
 }
 
 function BranchDiagram() {
+  const [hoverMain, setHoverMain] = useState(false)
+  const [hoverFeature, setHoverFeature] = useState(false)
   return (
     <div className="relative w-full">
       <svg viewBox="0 0 400 180" className="w-full max-w-sm mx-auto">
@@ -105,18 +107,54 @@ function BranchDiagram() {
         <circle cx="160" cy="130" r="6" fill="#15803d" />
 
         {/* Main branch node */}
-        <rect x="8" y="106" width="148" height="48" rx="10" fill="#f0fdf4" stroke="#22c55e" strokeWidth="2" />
-        <text x="22" y="126" fontSize="12" fontWeight="700" fill="#15803d" fontFamily="monospace">main</text>
-        <text x="22" y="144" fontSize="10" fill="#16a34a" fontFamily="ui-sans-serif, system-ui, sans-serif">Default branch</text>
-        <text x="126" y="130" fontSize="16">🔒</text>
+        <g
+          onMouseEnter={() => setHoverMain(true)}
+          onMouseLeave={() => setHoverMain(false)}
+          style={{ cursor: 'pointer' }}
+        >
+          <rect x="8" y="106" width="148" height="48" rx="10" fill="#f0fdf4" stroke="#22c55e" strokeWidth="2"
+            style={{
+              transition: 'filter 0.2s, transform 0.2s',
+              transformOrigin: '82px 130px',
+              transform: hoverMain ? 'scale(1.05)' : 'scale(1)',
+              filter: hoverMain ? 'drop-shadow(0 3px 8px rgba(34,197,94,0.3))' : 'none',
+            }}
+          />
+          <text x="22" y="126" fontSize="12" fontWeight="700" fill="#15803d" fontFamily="monospace"
+            style={{ transition: 'transform 0.2s', transformOrigin: '82px 130px', transform: hoverMain ? 'scale(1.05)' : 'scale(1)' }}
+          >main</text>
+          <text x="22" y="144" fontSize="10" fill="#16a34a" fontFamily="ui-sans-serif, system-ui, sans-serif"
+            style={{ transition: 'transform 0.2s', transformOrigin: '82px 130px', transform: hoverMain ? 'scale(1.05)' : 'scale(1)' }}
+          >Default branch</text>
+          <text x="126" y="130" fontSize="16"
+            style={{ transition: 'transform 0.2s', transformOrigin: '82px 130px', transform: hoverMain ? 'scale(1.05)' : 'scale(1)' }}
+          >🔒</text>
+        </g>
 
         {/* Feature branch node */}
-        <rect x="232" y="36" width="160" height="48" rx="10" fill="#eef2ff" stroke="#6366f1" strokeWidth="2" />
-        {/* Step badge */}
-        <circle cx="232" cy="36" r="10" fill="#6366f1" />
-        <text x="228" y="40" fontSize="11" fontWeight="800" fill="white" fontFamily="ui-sans-serif, system-ui, sans-serif">1</text>
-        <text x="248" y="56" fontSize="11" fontWeight="700" fill="#4338ca" fontFamily="monospace">feature/new-model</text>
-        <text x="248" y="74" fontSize="10" fill="#6366f1" fontFamily="ui-sans-serif, system-ui, sans-serif">Your workspace</text>
+        <g
+          onMouseEnter={() => setHoverFeature(true)}
+          onMouseLeave={() => setHoverFeature(false)}
+          style={{ cursor: 'pointer' }}
+        >
+          <rect x="232" y="36" width="160" height="48" rx="10" fill="#eef2ff" stroke="#6366f1" strokeWidth="2"
+            style={{
+              transition: 'filter 0.2s, transform 0.2s',
+              transformOrigin: '312px 60px',
+              transform: hoverFeature ? 'scale(1.05)' : 'scale(1)',
+              filter: hoverFeature ? 'drop-shadow(0 3px 8px rgba(99,102,241,0.3))' : 'none',
+            }}
+          />
+          {/* Step badge */}
+          <circle cx="232" cy="36" r="10" fill="#6366f1" />
+          <text x="228" y="40" fontSize="11" fontWeight="800" fill="white" fontFamily="ui-sans-serif, system-ui, sans-serif">1</text>
+          <text x="248" y="56" fontSize="11" fontWeight="700" fill="#4338ca" fontFamily="monospace"
+            style={{ transition: 'transform 0.2s', transformOrigin: '312px 60px', transform: hoverFeature ? 'scale(1.05)' : 'scale(1)' }}
+          >feature/new-model</text>
+          <text x="248" y="74" fontSize="10" fill="#6366f1" fontFamily="ui-sans-serif, system-ui, sans-serif"
+            style={{ transition: 'transform 0.2s', transformOrigin: '312px 60px', transform: hoverFeature ? 'scale(1.05)' : 'scale(1)' }}
+          >Your workspace</text>
+        </g>
       </svg>
     </div>
   )
@@ -496,6 +534,9 @@ function CreatePRPanel() {
 }
 
 function PRDiagram() {
+  const [hoverFeature, setHoverFeature] = useState(false)
+  const [hoverMain, setHoverMain] = useState(false)
+  const [hoverMerged, setHoverMerged] = useState(false)
   return (
     <svg viewBox="0 0 400 130" className="w-full max-w-sm mx-auto">
       {/* main line */}
@@ -504,31 +545,82 @@ function PRDiagram() {
       {/* feature branch line (dashed, going into main) */}
       <line x1="0" y1="35" x2="240" y2="35" stroke="#6366f1" strokeWidth="3" strokeLinecap="round" strokeDasharray="6 4" />
 
-      {/* merge curve: feature → main */}
+      {/* merge curve: feature -> main */}
       <path d="M 240 35 C 280 35 290 80 310 105" stroke="#6366f1" strokeWidth="3" fill="none" strokeLinecap="round" />
 
       {/* merge point dot on main */}
       <circle cx="310" cy="105" r="7" fill="#6366f1" stroke="white" strokeWidth="2" />
       <text x="305" y="109" fontSize="9" fontWeight="800" fill="white" fontFamily="ui-sans-serif, system-ui, sans-serif">✓</text>
 
-      {/* PR arrow label */}
-      <rect x="170" y="44" width="70" height="20" rx="5" fill="#fef3c7" stroke="#f59e0b" strokeWidth="1.5" />
-      <text x="175" y="58" fontSize="9" fontWeight="600" fill="#92400e" fontFamily="ui-sans-serif, system-ui, sans-serif">Pull Request</text>
+      {/* PR arrow label - centered on the dashed line */}
+      <rect x="170" y="25" width="70" height="20" rx="5" fill="#fef3c7" stroke="#f59e0b" strokeWidth="1.5" />
+      <text x="175" y="39" fontSize="9" fontWeight="600" fill="#92400e" fontFamily="ui-sans-serif, system-ui, sans-serif">Pull Request</text>
 
       {/* main node */}
-      <rect x="8" y="84" width="100" height="42" rx="10" fill="#f0fdf4" stroke="#22c55e" strokeWidth="2" />
-      <text x="22" y="102" fontSize="12" fontWeight="700" fill="#15803d" fontFamily="monospace">main</text>
-      <text x="22" y="118" fontSize="10" fill="#16a34a" fontFamily="ui-sans-serif, system-ui, sans-serif">protected</text>
+      <g
+        onMouseEnter={() => setHoverMain(true)}
+        onMouseLeave={() => setHoverMain(false)}
+        style={{ cursor: 'pointer' }}
+      >
+        <rect x="8" y="84" width="100" height="42" rx="10" fill="#f0fdf4" stroke="#22c55e" strokeWidth="2"
+          style={{
+            transition: 'filter 0.2s, transform 0.2s',
+            transformOrigin: '58px 105px',
+            transform: hoverMain ? 'scale(1.05)' : 'scale(1)',
+            filter: hoverMain ? 'drop-shadow(0 3px 8px rgba(34,197,94,0.3))' : 'none',
+          }}
+        />
+        <text x="22" y="102" fontSize="12" fontWeight="700" fill="#15803d" fontFamily="monospace"
+          style={{ transition: 'transform 0.2s', transformOrigin: '58px 105px', transform: hoverMain ? 'scale(1.05)' : 'scale(1)' }}
+        >main</text>
+        <text x="22" y="118" fontSize="10" fill="#16a34a" fontFamily="ui-sans-serif, system-ui, sans-serif"
+          style={{ transition: 'transform 0.2s', transformOrigin: '58px 105px', transform: hoverMain ? 'scale(1.05)' : 'scale(1)' }}
+        >protected</text>
+      </g>
 
       {/* feature node */}
-      <rect x="8" y="12" width="156" height="46" rx="10" fill="#eef2ff" stroke="#6366f1" strokeWidth="2" />
-      <text x="22" y="32" fontSize="11" fontWeight="700" fill="#4338ca" fontFamily="monospace">feature/new-model</text>
-      <text x="22" y="48" fontSize="10" fill="#6366f1" fontFamily="ui-sans-serif, system-ui, sans-serif">your branch</text>
+      <g
+        onMouseEnter={() => setHoverFeature(true)}
+        onMouseLeave={() => setHoverFeature(false)}
+        style={{ cursor: 'pointer' }}
+      >
+        <rect x="8" y="12" width="156" height="46" rx="10" fill="#eef2ff" stroke="#6366f1" strokeWidth="2"
+          style={{
+            transition: 'filter 0.2s, transform 0.2s',
+            transformOrigin: '86px 35px',
+            transform: hoverFeature ? 'scale(1.05)' : 'scale(1)',
+            filter: hoverFeature ? 'drop-shadow(0 3px 8px rgba(99,102,241,0.3))' : 'none',
+          }}
+        />
+        <text x="22" y="32" fontSize="11" fontWeight="700" fill="#4338ca" fontFamily="monospace"
+          style={{ transition: 'transform 0.2s', transformOrigin: '86px 35px', transform: hoverFeature ? 'scale(1.05)' : 'scale(1)' }}
+        >feature/new-model</text>
+        <text x="22" y="48" fontSize="10" fill="#6366f1" fontFamily="ui-sans-serif, system-ui, sans-serif"
+          style={{ transition: 'transform 0.2s', transformOrigin: '86px 35px', transform: hoverFeature ? 'scale(1.05)' : 'scale(1)' }}
+        >your branch</text>
+      </g>
 
       {/* merged label */}
-      <rect x="320" y="84" width="75" height="42" rx="10" fill="#f0fdf4" stroke="#22c55e" strokeWidth="2" />
-      <text x="332" y="102" fontSize="10" fontWeight="700" fill="#15803d" fontFamily="ui-sans-serif, system-ui, sans-serif">merged</text>
-      <text x="332" y="118" fontSize="10" fill="#16a34a" fontFamily="ui-sans-serif, system-ui, sans-serif">into main</text>
+      <g
+        onMouseEnter={() => setHoverMerged(true)}
+        onMouseLeave={() => setHoverMerged(false)}
+        style={{ cursor: 'pointer' }}
+      >
+        <rect x="320" y="84" width="75" height="42" rx="10" fill="#f0fdf4" stroke="#22c55e" strokeWidth="2"
+          style={{
+            transition: 'filter 0.2s, transform 0.2s',
+            transformOrigin: '357.5px 105px',
+            transform: hoverMerged ? 'scale(1.05)' : 'scale(1)',
+            filter: hoverMerged ? 'drop-shadow(0 3px 8px rgba(34,197,94,0.3))' : 'none',
+          }}
+        />
+        <text x="332" y="102" fontSize="10" fontWeight="700" fill="#15803d" fontFamily="ui-sans-serif, system-ui, sans-serif"
+          style={{ transition: 'transform 0.2s', transformOrigin: '357.5px 105px', transform: hoverMerged ? 'scale(1.05)' : 'scale(1)' }}
+        >merged</text>
+        <text x="332" y="118" fontSize="10" fill="#16a34a" fontFamily="ui-sans-serif, system-ui, sans-serif"
+          style={{ transition: 'transform 0.2s', transformOrigin: '357.5px 105px', transform: hoverMerged ? 'scale(1.05)' : 'scale(1)' }}
+        >into main</text>
+      </g>
     </svg>
   )
 }

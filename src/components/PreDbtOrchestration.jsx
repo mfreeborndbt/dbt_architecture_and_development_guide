@@ -98,7 +98,7 @@ export default function PreDbtOrchestration() {
             </h3>
           </div>
 
-          <div className="bg-gray-950 rounded-xl p-4 font-mono text-sm space-y-1">
+          <div className="bg-white border border-gray-200 rounded-xl p-4 font-mono text-sm space-y-1">
             <div className="text-gray-500 text-xs mb-2">models/</div>
             {models.map((m, i) => (
               <motion.div
@@ -106,9 +106,9 @@ export default function PreDbtOrchestration() {
                 initial={{ opacity: 0, x: -10 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: i * 0.08, duration: 0.3 }}
-                className="flex items-center gap-2 text-gray-300 py-1 px-2 rounded hover:bg-gray-800/50 transition-colors"
+                className="flex items-center gap-2 text-gray-700 py-1 px-2 rounded hover:bg-gray-100 transition-colors"
               >
-                <svg className="w-4 h-4 text-emerald-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <svg className="w-4 h-4 text-emerald-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
                 <span>{m.file}</span>

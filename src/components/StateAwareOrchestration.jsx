@@ -543,7 +543,7 @@ export default function StateAwareOrchestration() {
       })()}
 
       {/* Terminal */}
-      <div ref={terminalRef} className="bg-gray-950 rounded-xl p-4 font-mono text-xs max-h-64 overflow-y-auto">
+      <div ref={terminalRef} className="bg-white border border-gray-200 rounded-xl p-4 font-mono text-xs max-h-64 overflow-y-auto">
         <AnimatePresence>
           {terminalLines.map((line, i) => (
             <motion.div
@@ -552,17 +552,17 @@ export default function StateAwareOrchestration() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.15 }}
               className={
-                line.type === 'command' ? 'text-emerald-400 font-bold' :
-                line.type === 'fresh' ? 'text-amber-400 font-semibold' :
+                line.type === 'command' ? 'text-emerald-700 font-bold' :
+                line.type === 'fresh' ? 'text-amber-600 font-semibold' :
                 line.type === 'info' ? 'text-gray-400' :
-                line.type === 'run' ? 'text-blue-400' :
-                line.type === 'ok' ? 'text-emerald-400' :
-                line.type === 'test' ? 'text-amber-400' :
+                line.type === 'run' ? 'text-blue-600' :
+                line.type === 'ok' ? 'text-emerald-600' :
+                line.type === 'test' ? 'text-amber-600' :
                 line.type === 'fail' ? 'text-red-400' :
                 line.type === 'skip' ? 'text-gray-500' :
-                line.type === 'reuse' ? 'text-indigo-400' :
-                line.type === 'success' ? 'text-emerald-300 font-bold' :
-                line.type === 'warn' ? 'text-amber-300 font-bold' :
+                line.type === 'reuse' ? 'text-indigo-600' :
+                line.type === 'success' ? 'text-emerald-700 font-bold' :
+                line.type === 'warn' ? 'text-amber-600 font-bold' :
                 ''
               }
             >
@@ -571,7 +571,7 @@ export default function StateAwareOrchestration() {
           ))}
         </AnimatePresence>
         {terminalLines.length === 0 && (
-          <div className="text-gray-600">Click "Run Simulation" to see state-aware orchestration...</div>
+          <div className="text-gray-400">Click "Run Simulation" to see state-aware orchestration...</div>
         )}
       </div>
     </div>

@@ -178,8 +178,8 @@ export default function TestingExplanation() {
                 <span className="w-1.5 h-1.5 rounded-full bg-blue-400" />
                 Compiled SQL
               </div>
-              <div className="bg-gray-950 rounded-xl p-4 font-mono text-[11px] leading-relaxed">
-                <pre className="text-gray-300">{test.sql}</pre>
+              <div className="bg-white border border-gray-200 rounded-xl p-4 font-mono text-[11px] leading-relaxed">
+                <pre className="text-gray-700">{test.sql}</pre>
               </div>
             </div>
 

@@ -314,13 +314,13 @@ function CodeLine({ parts }) {
   )
 }
 
-const KW   = '#60a5fa'  // blue — SQL keywords
+const KW   = '#2563eb'  // blue — SQL keywords
 const JJ   = '#f97316'  // orange — jinja delimiters
-const FN   = '#c084fc'  // purple — ref / config
-const STR  = '#4ade80'  // green — string values
+const FN   = '#9333ea'  // purple — ref / config
+const STR  = '#16a34a'  // green — string values
 const CMT  = '#6b7280'  // gray — comments
-const FQN_C = '#67e8f9' // cyan — compiled FQN
-const TXT  = '#e2e8f0'  // default text
+const FQN_C = '#0e7490' // cyan — compiled FQN
+const TXT  = '#334155'  // default text
 
 function buildCode(tab) {
   const p = tab.prefix  // null = logical
@@ -396,14 +396,14 @@ function CodeView({ tab }) {
         </div>
 
         {/* Right: code */}
-        <div className="flex-1 bg-gray-900 p-5 overflow-x-auto">
+        <div className="flex-1 bg-white border-l border-gray-200 p-5 overflow-x-auto">
           {/* File header */}
-          <div className="flex items-center gap-3 mb-4 pb-3 border-b border-gray-700">
-            <span className="text-gray-400 font-mono text-xs">📄 int_enriched_customer.sql</span>
+          <div className="flex items-center gap-3 mb-4 pb-3 border-b border-gray-200">
+            <span className="text-gray-500 font-mono text-xs">📄 int_enriched_customer.sql</span>
             <span className={`ml-auto text-[10px] px-2 py-0.5 rounded font-semibold ${
               isCompiled
-                ? 'bg-cyan-900 text-cyan-300'
-                : 'bg-orange-900 text-orange-300'
+                ? 'bg-cyan-100 text-cyan-700'
+                : 'bg-orange-100 text-orange-700'
             }`}>
               {isCompiled ? `compiled · ${tab.prefix}` : 'source (uncompiled)'}
             </span>
@@ -424,12 +424,12 @@ function CodeView({ tab }) {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.2 }}
-              className="mt-6 border-l-2 border-cyan-500 pl-3 text-xs text-gray-400"
+              className="mt-6 border-l-2 border-cyan-500 pl-3 text-xs text-gray-500"
             >
-              <span className="text-cyan-400 font-semibold">One codebase.</span>
+              <span className="text-cyan-700 font-semibold">One codebase.</span>
               {' '}The SQL didn't change, only the destination schema.
-              {' '}<span className="text-cyan-400 font-mono">{`{{ ref() }}`}</span>
-              {' '}compiled to <span className="text-cyan-300 font-mono">{tab.prefix}</span>.
+              {' '}<span className="text-cyan-700 font-mono">{`{{ ref() }}`}</span>
+              {' '}compiled to <span className="text-cyan-700 font-mono">{tab.prefix}</span>.
             </motion.div>
           )}
         </div>

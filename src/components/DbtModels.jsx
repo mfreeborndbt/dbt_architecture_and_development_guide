@@ -379,9 +379,9 @@ function ReusableLogicVisual({ showDbt }) {
   if (!showDbt) {
     return (
       <div className="space-y-4">
-        <div className="bg-gray-900 rounded-lg p-4 border border-red-500/30">
-          <p className="text-red-400 text-xs font-semibold mb-2">stg_customers.sql</p>
-          <pre className="text-gray-400 text-[11px] leading-relaxed whitespace-pre-wrap">{`SELECT
+        <div className="bg-white border border-gray-200 rounded-lg p-4">
+          <p className="text-red-600 text-xs font-semibold mb-2">stg_customers.sql</p>
+          <pre className="text-gray-700 text-[11px] leading-relaxed whitespace-pre-wrap">{`SELECT
   id,
   name,
   REGEXP_REPLACE(
@@ -389,11 +389,11 @@ function ReusableLogicVisual({ showDbt }) {
     '^1?(\\d{10})$', '(\\1) \\2-\\3'
   ) AS phone_clean
 FROM raw.customers`}</pre>
-          <p className="text-red-400/60 text-[10px] mt-2">Phone normalization logic inline</p>
+          <p className="text-red-600/60 text-[10px] mt-2">Phone normalization logic inline</p>
         </div>
-        <div className="bg-gray-900 rounded-lg p-4 border border-red-500/30">
-          <p className="text-red-400 text-xs font-semibold mb-2">stg_vendors.sql</p>
-          <pre className="text-gray-400 text-[11px] leading-relaxed whitespace-pre-wrap">{`SELECT
+        <div className="bg-white border border-gray-200 rounded-lg p-4">
+          <p className="text-red-600 text-xs font-semibold mb-2">stg_vendors.sql</p>
+          <pre className="text-gray-700 text-[11px] leading-relaxed whitespace-pre-wrap">{`SELECT
   id,
   company_name,
   REGEXP_REPLACE(
@@ -401,7 +401,7 @@ FROM raw.customers`}</pre>
     '^1?(\\d{10})$', '(\\1) \\2-\\3'
   ) AS phone_clean
 FROM raw.vendors`}</pre>
-          <p className="text-red-400/60 text-[10px] mt-2">Same regex copied. Update one, forget the other.</p>
+          <p className="text-red-600/60 text-[10px] mt-2">Same regex copied. Update one, forget the other.</p>
         </div>
       </div>
     )
@@ -410,25 +410,25 @@ FROM raw.vendors`}</pre>
   return (
     <div className="space-y-4">
       {/* Macro definition */}
-      <div className="bg-gray-900 rounded-lg p-4 border-2 border-amber-500/60">
-        <p className="text-amber-400 text-xs font-semibold mb-2">macros/normalize_phone.sql</p>
-        <pre className="text-gray-300 text-[11px] leading-relaxed whitespace-pre-wrap">{`{% macro normalize_phone(column_name) %}
+      <div className="bg-white border border-gray-200 rounded-lg p-4 border-l-4 border-l-amber-300">
+        <p className="text-amber-600 text-xs font-semibold mb-2">macros/normalize_phone.sql</p>
+        <pre className="text-gray-700 text-[11px] leading-relaxed whitespace-pre-wrap">{`{% macro normalize_phone(column_name) %}
   REGEXP_REPLACE(
     REGEXP_REPLACE({{ column_name }}, '[^0-9]', ''),
     '^1?(\\d{10})$', '(\\1) \\2-\\3'
   )
 {% endmacro %}`}</pre>
-        <p className="text-amber-400/70 text-[10px] mt-2">Defined once. Tested once. Updated once.</p>
+        <p className="text-amber-600/70 text-[10px] mt-2">Defined once. Tested once. Updated once.</p>
       </div>
       {/* Models calling the macro */}
       <div className="grid grid-cols-2 gap-3">
-        <div className="bg-gray-900 rounded-lg p-3 border border-emerald-500/20">
-          <p className="text-emerald-400 text-[10px] font-semibold mb-1">stg_customers.sql</p>
-          <pre className="text-gray-400 text-[11px] leading-relaxed whitespace-pre-wrap">{'SELECT\n  id,\n  name,\n  '}<span className="text-amber-400 font-semibold">{"{{ normalize_phone('phone') }}"}</span>{'\n    AS phone_clean\nFROM {{ source(\'raw\',\'customers\') }}'}</pre>
+        <div className="bg-white border border-gray-200 rounded-lg p-3">
+          <p className="text-emerald-600 text-[10px] font-semibold mb-1">stg_customers.sql</p>
+          <pre className="text-gray-700 text-[11px] leading-relaxed whitespace-pre-wrap">{'SELECT\n  id,\n  name,\n  '}<span className="text-amber-600 font-semibold bg-amber-100 px-0.5 rounded">{"{{ normalize_phone('phone') }}"}</span>{'\n    AS phone_clean\nFROM {{ source(\'raw\',\'customers\') }}'}</pre>
         </div>
-        <div className="bg-gray-900 rounded-lg p-3 border border-emerald-500/20">
-          <p className="text-emerald-400 text-[10px] font-semibold mb-1">stg_vendors.sql</p>
-          <pre className="text-gray-400 text-[11px] leading-relaxed whitespace-pre-wrap">{'SELECT\n  id,\n  company_name,\n  '}<span className="text-amber-400 font-semibold">{"{{ normalize_phone('phone') }}"}</span>{'\n    AS phone_clean\nFROM {{ source(\'raw\',\'vendors\') }}'}</pre>
+        <div className="bg-white border border-gray-200 rounded-lg p-3">
+          <p className="text-emerald-600 text-[10px] font-semibold mb-1">stg_vendors.sql</p>
+          <pre className="text-gray-700 text-[11px] leading-relaxed whitespace-pre-wrap">{'SELECT\n  id,\n  company_name,\n  '}<span className="text-amber-600 font-semibold bg-amber-100 px-0.5 rounded">{"{{ normalize_phone('phone') }}"}</span>{'\n    AS phone_clean\nFROM {{ source(\'raw\',\'vendors\') }}'}</pre>
         </div>
       </div>
     </div>
@@ -496,9 +496,8 @@ function DDLVisual({ showDbt }) {
           <div className="bg-amber-50 border-l-2 border-amber-400 -ml-2 pl-2 py-1 mb-2">
             <pre className="text-amber-600 whitespace-pre-wrap">{`{{
   config(
-    materialized = 'incremental',
-    unique_key   = 'order_id',
-    incremental_strategy = 'merge'
+    materialized='incremental',
+    unique_key='order_id'
   )
 }}`}</pre>
           </div>
@@ -514,8 +513,8 @@ function DDLVisual({ showDbt }) {
           </div>
           <div className="bg-amber-50 border-l-2 border-amber-400 -ml-2 pl-2 py-1 mt-2">
             <pre className="text-amber-600 whitespace-pre-wrap">{`{% if is_incremental() %}
-WHERE o.order_date >= DATEADD(
-  day, -3, CURRENT_DATE
+WHERE updated_at > (
+  select max(updated_at) from {{ this }}
 )
 {% endif %}`}</pre>
           </div>
@@ -534,34 +533,74 @@ function LineageVisual({ showDbt }) {
   if (!showDbt) {
     return (
       <div className="space-y-4">
-        <div className="bg-white border border-gray-200 rounded-lg p-4">
-          <p className="text-red-600 text-xs font-semibold mb-3">Where does this column come from?</p>
-          <div className="space-y-2 text-gray-700 text-[11px]">
-            <p>Your documentation:</p>
-            <ul className="list-disc list-inside space-y-1 text-gray-500">
-              <li>Confluence pages (outdated)</li>
-              <li>Spreadsheets (who updates these?)</li>
-              <li>Tribal knowledge (hope they stay)</li>
-              <li>Slack threads (good luck searching)</li>
-            </ul>
+        <div className="bg-white border border-gray-200 border-l-4 border-l-red-300 rounded-lg p-4">
+          <p className="text-red-600 text-xs font-semibold mb-3 flex items-center gap-1.5">
+            <span className="text-base">📄</span> Where does this column come from?
+          </p>
+          <p className="text-gray-700 text-[11px] mb-2">Your documentation:</p>
+          <div className="grid grid-cols-2 gap-2">
+            <div className="flex items-center gap-2 text-[11px] text-gray-500">
+              <span className="w-1.5 h-1.5 rounded-full bg-red-300 shrink-0" />
+              Confluence pages (outdated)
+            </div>
+            <div className="flex items-center gap-2 text-[11px] text-gray-500">
+              <span className="w-1.5 h-1.5 rounded-full bg-red-300 shrink-0" />
+              Spreadsheets (who updates these?)
+            </div>
+            <div className="flex items-center gap-2 text-[11px] text-gray-500">
+              <span className="w-1.5 h-1.5 rounded-full bg-red-300 shrink-0" />
+              Tribal knowledge (hope they stay)
+            </div>
+            <div className="flex items-center gap-2 text-[11px] text-gray-500">
+              <span className="w-1.5 h-1.5 rounded-full bg-red-300 shrink-0" />
+              Slack threads (good luck searching)
+            </div>
           </div>
         </div>
-        <div className="bg-white border border-gray-200 rounded-lg p-4">
-          <p className="text-red-600 text-xs font-semibold mb-3">Impact analysis before changes:</p>
-          <div className="space-y-1 text-gray-500 text-[11px]">
-            <p>Manually grep through scripts</p>
-            <p>Ask around on Slack</p>
-            <p>"I think these 3 reports use it"</p>
-            <p>Deploy and hope nothing breaks</p>
+        <div className="bg-white border border-gray-200 border-l-4 border-l-amber-300 rounded-lg p-4">
+          <p className="text-red-600 text-xs font-semibold mb-3 flex items-center gap-1.5">
+            <span className="text-base">🔍</span> Impact analysis before changes
+          </p>
+          <div className="grid grid-cols-2 gap-2">
+            <div className="flex items-center gap-2 text-[11px] text-gray-500">
+              <span className="w-1.5 h-1.5 rounded-full bg-amber-300 shrink-0" />
+              Manually grep through scripts
+            </div>
+            <div className="flex items-center gap-2 text-[11px] text-gray-500">
+              <span className="w-1.5 h-1.5 rounded-full bg-amber-300 shrink-0" />
+              Ask around on Slack
+            </div>
+            <div className="flex items-center gap-2 text-[11px] text-gray-500">
+              <span className="w-1.5 h-1.5 rounded-full bg-amber-300 shrink-0" />
+              "I think these 3 reports use it"
+            </div>
+            <div className="flex items-center gap-2 text-[11px] text-gray-500">
+              <span className="w-1.5 h-1.5 rounded-full bg-amber-300 shrink-0" />
+              Deploy and hope nothing breaks
+            </div>
           </div>
         </div>
-        <div className="bg-white border border-gray-200 rounded-lg p-4">
-          <p className="text-red-600 text-xs font-semibold mb-3">New team member onboarding:</p>
-          <div className="space-y-1 text-gray-500 text-[11px]">
-            <p>"Talk to Sarah, she built that"</p>
-            <p>"Check the wiki, it might be there"</p>
-            <p>"Just read the 2000-line SQL file"</p>
+        <div className="bg-white border border-gray-200 border-l-4 border-l-orange-300 rounded-lg p-4">
+          <p className="text-red-600 text-xs font-semibold mb-3 flex items-center gap-1.5">
+            <span className="text-base">👋</span> New team member onboarding
+          </p>
+          <div className="grid grid-cols-1 gap-2">
+            <div className="flex items-center gap-2 text-[11px] text-gray-500">
+              <span className="w-1.5 h-1.5 rounded-full bg-orange-300 shrink-0" />
+              "Talk to Sarah, she built that"
+            </div>
+            <div className="flex items-center gap-2 text-[11px] text-gray-500">
+              <span className="w-1.5 h-1.5 rounded-full bg-orange-300 shrink-0" />
+              "Check the wiki, it might be there"
+            </div>
+            <div className="flex items-center gap-2 text-[11px] text-gray-500">
+              <span className="w-1.5 h-1.5 rounded-full bg-orange-300 shrink-0" />
+              "Just read the 2000-line SQL file"
+            </div>
           </div>
+        </div>
+        <div className="bg-red-50 border border-red-200 rounded-lg p-3">
+          <p className="text-red-700 text-[11px] font-medium text-center">Without lineage, every change is a guessing game. Documentation drifts the moment it is written.</p>
         </div>
       </div>
     )
@@ -594,19 +633,36 @@ function LineageVisual({ showDbt }) {
       <div className="bg-white border border-gray-200 rounded-lg p-4">
         <p className="text-emerald-700 text-xs font-semibold mb-2">Column-level Lineage</p>
         <div className="flex items-center justify-center gap-3 text-[10px] font-mono">
-          <div className="bg-indigo-50 border border-indigo-200 rounded px-3 py-2 text-indigo-700">
-            <p className="font-semibold mb-1">src_orders</p>
-            <p>order_total</p>
+          <div className="flex flex-col items-center gap-1">
+            <span className="bg-emerald-100 text-emerald-700 text-[8px] font-bold px-1.5 py-0.5 rounded-full uppercase tracking-wide">Raw</span>
+            <div className="bg-indigo-50 border border-indigo-200 rounded px-3 py-2 text-indigo-700">
+              <p className="font-semibold mb-1">src_orders</p>
+              <p>order_total</p>
+            </div>
           </div>
-          <span className="text-gray-400">-&gt;</span>
-          <div className="bg-emerald-50 border border-emerald-200 rounded px-3 py-2 text-emerald-700">
-            <p className="font-semibold mb-1">stg_orders</p>
-            <p>amount</p>
+          <span className="text-gray-400 mt-4">-&gt;</span>
+          <div className="flex flex-col items-center gap-1">
+            <span className="bg-purple-100 text-purple-700 text-[8px] font-bold px-1.5 py-0.5 rounded-full uppercase tracking-wide">Rename</span>
+            <div className="bg-emerald-50 border border-emerald-200 rounded px-3 py-2 text-emerald-700">
+              <p className="font-semibold mb-1">stg_orders</p>
+              <p>amount</p>
+            </div>
           </div>
-          <span className="text-gray-400">-&gt;</span>
-          <div className="bg-amber-50 border border-amber-200 rounded px-3 py-2 text-amber-700">
-            <p className="font-semibold mb-1">fct_orders</p>
-            <p>revenue</p>
+          <span className="text-gray-400 mt-4">-&gt;</span>
+          <div className="flex flex-col items-center gap-1">
+            <span className="bg-amber-100 text-amber-700 text-[8px] font-bold px-1.5 py-0.5 rounded-full uppercase tracking-wide">Transformation</span>
+            <div className="bg-amber-50 border border-amber-200 rounded px-3 py-2 text-amber-700">
+              <p className="font-semibold mb-1">int_order_items</p>
+              <p>net_amount</p>
+            </div>
+          </div>
+          <span className="text-gray-400 mt-4">-&gt;</span>
+          <div className="flex flex-col items-center gap-1">
+            <span className="bg-blue-100 text-blue-700 text-[8px] font-bold px-1.5 py-0.5 rounded-full uppercase tracking-wide">Passthrough</span>
+            <div className="bg-amber-50 border border-amber-200 rounded px-3 py-2 text-amber-700">
+              <p className="font-semibold mb-1">fct_orders</p>
+              <p>revenue</p>
+            </div>
           </div>
         </div>
       </div>
@@ -672,7 +728,7 @@ function EnvironmentVisual({ showDbt }) {
                 { env: 'qa', schema: 'staging_db.qa_schema', color: 'amber' },
                 { env: 'prod', schema: 'prod_db.analytics', color: 'emerald' },
               ].map(({ env: e, schema, color }) => (
-                <div key={e} className="bg-white border border-gray-200 rounded-lg p-4 font-mono text-[10px] leading-relaxed">
+                <div key={e} className="bg-white border border-gray-200 rounded-lg p-4 font-mono text-[10px] leading-relaxed overflow-hidden">
                   <div className="text-gray-500 mb-2">-- {e}_int_enriched_customer.sql</div>
                   <div className="text-gray-800">
                     <div><span className="text-blue-600">CREATE TABLE</span></div>
@@ -1075,7 +1131,7 @@ export default function DbtModels() {
       <div className="bg-white border border-gray-200/60 rounded-2xl shadow-sm overflow-hidden">
         <div className="flex flex-col lg:flex-row">
           {/* Left sidebar: feature buttons */}
-          <div className="lg:w-56 shrink-0 bg-gray-50 border-b lg:border-b-0 lg:border-r border-gray-200/60 p-3">
+          <div className="lg:w-64 shrink-0 bg-gray-50 border-b lg:border-b-0 lg:border-r border-gray-200/60 p-3">
             <div className="flex lg:flex-col gap-1.5 overflow-x-auto lg:overflow-x-visible">
               {/* What is a Model - top section */}
               {advantages.filter(a => a.section === 'overview').map((adv) => {

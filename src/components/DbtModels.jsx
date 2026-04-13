@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 
 const advantages = [
@@ -24,57 +24,7 @@ const advantages = [
     id: 'testing',
     title: 'Data Quality Framework',
     icon: '🧪',
-    without: `-- Ad-hoc validation scripts
--- Run manually after each deploy
--- No standard framework
-
-SELECT COUNT(*) FROM orders
-WHERE order_id IS NULL;
--- 3 rows... is that bad?
-
-SELECT order_id, COUNT(*)
-FROM orders
-GROUP BY 1
-HAVING COUNT(*) > 1;
--- Duplicates found. Who gets paged?
-
-SELECT COUNT(*) FROM orders
-WHERE status NOT IN (
-  'placed','shipped','returned'
-);
--- Unknown statuses. Since when?
-
--- No pass/fail thresholds
--- No blocking of downstream consumers
--- No audit trail of test results
--- No alerting integration`,
-    with_dbt: `# _stg_models.yml
-models:
-  - name: stg_orders
-    columns:
-      - name: order_id
-        data_tests:
-          - unique
-          - not_null
-
-      - name: status
-        data_tests:
-          - accepted_values:
-              values:
-                - 'placed'
-                - 'shipped'
-                - 'returned'
-
-      - name: customer_id
-        data_tests:
-          - not_null
-          - relationships:
-              to: ref('stg_customers')
-              field: customer_id
-
-# Tests run automatically in CI and prod.
-# Failures block downstream models.
-# Results are logged and auditable.`,
+    custom: 'testing',
   },
   {
     id: 'lineage',
@@ -86,90 +36,13 @@ models:
     id: 'environments',
     title: 'Environment Aware',
     icon: '🌍',
-    without: `-- dev_orders.sql
-CREATE TABLE dev_db.dev_schema.orders
-AS SELECT * FROM dev_db.raw.orders;
-
--- staging_orders.sql
-CREATE TABLE staging_db.staging.orders
-AS SELECT * FROM staging_db.raw.orders;
-
--- prod_orders.sql
-CREATE TABLE prod_db.analytics.orders
-AS SELECT * FROM prod_db.raw.orders;
-
--- Three copies of the same logic
--- Different databases and schemas
--- "It works in dev!"
---   ...breaks in prod
-
--- Add a new model?
--- Create 3 new files.
--- Rename a column?
--- Update all 3.`,
-    with_dbt: `-- orders.sql (one file, all envs)
-SELECT *
-FROM {{ source('raw', 'orders') }}
-
-
--- dbt resolves the target at runtime:
-
--- $ dbt run --target dev
---   > dev_db.dev_miles.orders
-
--- $ dbt run --target staging
---   > staging_db.staging.orders
-
--- $ dbt run --target prod
---   > prod_db.analytics.orders
-
-
--- Same code. Different targets.
--- Zero manual changes.
--- One file to maintain.`,
+    custom: 'environments',
   },
   {
     id: 'versioned',
     title: 'Version Controlled',
     icon: '📦',
-    without: `-- "Who changed the revenue calc?"
--- Check the audit log... if one exists
-
--- orders_v2_final_FINAL_v3.sql
-
--- Stored procedures in the warehouse
---   No git history
---   No code review process
---   No rollback plan
---   "Just run this script"
-
--- Scheduled jobs reference:
---   Hardcoded SQL in the scheduler
---   Scripts on someone's laptop
---   A shared drive somewhere
-
--- Rollback plan:
---   "Does anyone have the old version?"
---   "Check your downloads folder"`,
-    with_dbt: `-- Every model is a file in Git
-
--- Full history:
---   git log models/fct_orders.sql
---   Who changed it, when, and why
-
--- Code review:
---   Pull requests before production
---   CI runs tests on every PR
---   Team reviews the diff
-
--- Rollback:
---   git revert <commit>
---   Redeploy. Done.
-
--- Model versions:
---   fct_orders_v1 (deprecated)
---   fct_orders_v2 (current)
---   Consumers migrate on their schedule`,
+    custom: 'versioned',
   },
 ]
 
@@ -569,6 +442,412 @@ function LineageVisual({ showDbt }) {
 }
 
 /* ------------------------------------------------------------------ */
+/*  Environment Aware Visual                                          */
+/* ------------------------------------------------------------------ */
+
+const envTabs = [
+  { key: 'logical', label: 'Logical', color: 'gray', schema: null },
+  { key: 'dev', label: 'Dev', color: 'blue', schema: 'dev.dbt_user1' },
+  { key: 'qa', label: 'QA', color: 'amber', schema: 'qa.pr_1234' },
+  { key: 'prod', label: 'Prod', color: 'emerald', schema: 'prod.analytics' },
+]
+
+const envTabColors = {
+  gray: { active: 'bg-gray-700 text-white', inactive: 'bg-white text-gray-600 border border-gray-200' },
+  blue: { active: 'bg-blue-600 text-white', inactive: 'bg-white text-gray-600 border border-gray-200' },
+  amber: { active: 'bg-amber-500 text-white', inactive: 'bg-white text-gray-600 border border-gray-200' },
+  emerald: { active: 'bg-emerald-600 text-white', inactive: 'bg-white text-gray-600 border border-gray-200' },
+}
+
+const envBadgeColors = {
+  blue: 'bg-blue-600 text-white',
+  amber: 'bg-amber-500 text-white',
+  emerald: 'bg-emerald-600 text-white',
+}
+
+function EnvironmentVisual({ showDbt }) {
+  const [activeEnv, setActiveEnv] = useState('logical')
+  const env = envTabs.find(e => e.key === activeEnv)
+
+  return (
+    <AnimatePresence mode="wait">
+      <motion.div
+        key={showDbt ? 'with' : 'without'}
+        initial={{ opacity: 0, x: showDbt ? 10 : -10 }}
+        animate={{ opacity: 1, x: 0 }}
+        exit={{ opacity: 0, x: showDbt ? -10 : 10 }}
+        transition={{ duration: 0.25 }}
+      >
+        {!showDbt ? (
+          <div className="bg-gray-50 border border-gray-200 rounded-xl p-5 space-y-4">
+            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">You maintain separate scripts for each environment</p>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+              {[
+                { env: 'dev', schema: 'dev_db.dev_schema', color: 'blue' },
+                { env: 'qa', schema: 'staging_db.qa_schema', color: 'amber' },
+                { env: 'prod', schema: 'prod_db.analytics', color: 'emerald' },
+              ].map(({ env: e, schema, color }) => (
+                <div key={e} className="bg-white border border-gray-200 rounded-lg p-4 font-mono text-[10px] leading-relaxed">
+                  <div className="text-gray-500 mb-2">-- {e}_int_enriched_customer.sql</div>
+                  <div className="text-gray-800">
+                    <div><span className="text-blue-600">CREATE TABLE</span></div>
+                    <div className={`text-${color}-600 font-bold`}>  {schema}.int_enriched_customer</div>
+                    <div><span className="text-blue-600">AS</span></div>
+                    <div className="mt-1"><span className="text-blue-600">SELECT</span></div>
+                    <div>  c.customer_id,</div>
+                    <div>  c.customer_name,</div>
+                    <div>  c.email,</div>
+                    <div>  g.region,</div>
+                    <div>  g.country</div>
+                    <div><span className="text-blue-600">FROM</span> <span className={`text-${color}-600`}>{schema}.stg_customers</span> c</div>
+                    <div><span className="text-blue-600">LEFT JOIN</span> <span className={`text-${color}-600`}>{schema}.stg_geoinfo</span> g</div>
+                    <div><span className="text-blue-600">ON</span> c.geo_id = g.geo_id</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <p className="text-xs text-red-600 font-medium">Three copies of the same logic. Different schemas hardcoded throughout. Change the query? Update all three files.</p>
+          </div>
+        ) : (
+          <div className="bg-gray-50 border border-gray-200 rounded-xl p-5 space-y-4">
+            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">One codebase. dbt compiles ref() to the right schema per environment.</p>
+
+            {/* Environment tabs */}
+            <div className="flex gap-2">
+              {envTabs.map(tab => {
+                const colors = envTabColors[tab.color]
+                return (
+                  <button
+                    key={tab.key}
+                    onClick={() => setActiveEnv(tab.key)}
+                    className={`px-4 py-1.5 rounded-full text-sm font-semibold transition-all duration-200 ${
+                      activeEnv === tab.key ? colors.active : colors.inactive
+                    }`}
+                  >
+                    {tab.label}
+                  </button>
+                )
+              })}
+            </div>
+
+            {/* Code display */}
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={activeEnv}
+                initial={{ opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -6 }}
+                transition={{ duration: 0.2 }}
+              >
+                <div className="bg-white border border-gray-200 rounded-xl p-5 font-mono text-[11px] leading-relaxed">
+                  {/* Header */}
+                  <div className="flex items-center justify-between mb-3 pb-3 border-b border-gray-200">
+                    <div className="text-gray-500 flex items-center gap-2">
+                      <span>📄</span> int_enriched_customer.sql
+                    </div>
+                    {env.schema && (
+                      <span className={`text-xs font-bold px-2.5 py-1 rounded-full ${envBadgeColors[env.color]}`}>
+                        compiled · {env.schema}
+                      </span>
+                    )}
+                  </div>
+
+                  {activeEnv === 'logical' ? (
+                    /* Logical view - the source code with ref() */
+                    <div className="text-gray-800 space-y-1">
+                      <div><span className="text-amber-600">{"{{ config(materialized='table') }}"}</span></div>
+                      <div className="mt-2"><span className="text-blue-600">select</span></div>
+                      <div>c.customer_id,</div>
+                      <div>c.customer_name,</div>
+                      <div>c.email,</div>
+                      <div>g.region,</div>
+                      <div>g.country</div>
+                      <div><span className="text-blue-600">from</span> <span className="text-emerald-600">{"{{ ref('stg_customers') }}"}</span> c</div>
+                      <div><span className="text-blue-600">left join</span> <span className="text-emerald-600">{"{{ ref('stg_geoinfo') }}"}</span> g</div>
+                      <div><span className="text-blue-600">on</span> c.geo_id = g.geo_id</div>
+                    </div>
+                  ) : (
+                    /* Compiled view - schema resolved */
+                    <div className="text-gray-800 space-y-1">
+                      <div className="text-gray-400">-- compiled for: {env.schema}</div>
+                      <div className="mt-2"><span className="text-blue-600">create table</span> <span className="text-cyan-600">{env.schema}.int_enriched_customer</span> <span className="text-blue-600">as</span></div>
+                      <div className="mt-2"><span className="text-blue-600">select</span></div>
+                      <div>c.customer_id,</div>
+                      <div>c.customer_name,</div>
+                      <div>c.email,</div>
+                      <div>g.region,</div>
+                      <div>g.country</div>
+                      <div><span className="text-blue-600">from</span> <span className="text-cyan-600">{env.schema}.stg_customers</span> c</div>
+                      <div><span className="text-blue-600">left join</span> <span className="text-cyan-600">{env.schema}.stg_geoinfo</span> g</div>
+                      <div><span className="text-blue-600">on</span> c.geo_id = g.geo_id</div>
+                    </div>
+                  )}
+
+                  {/* Callout */}
+                  {activeEnv !== 'logical' && (
+                    <div className="mt-4 pt-3 border-l-2 border-cyan-500 pl-3">
+                      <p className="text-xs text-gray-500">
+                        <span className="text-cyan-600 font-bold">One codebase.</span> The SQL didn't change, only the destination schema. <code className="text-cyan-600">{'{{ ref() }}'}</code> compiled to <span className="text-cyan-600">{env.schema}</span>.
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </motion.div>
+            </AnimatePresence>
+          </div>
+        )}
+      </motion.div>
+    </AnimatePresence>
+  )
+}
+
+/* ------------------------------------------------------------------ */
+/*  Version Controlled Visual                                         */
+/* ------------------------------------------------------------------ */
+
+function VersionControlVisual({ showDbt }) {
+  if (!showDbt) {
+    return (
+      <div className="space-y-4">
+        <div className="bg-white border border-gray-200 rounded-lg p-4">
+          <p className="text-red-600 text-xs font-semibold mb-2">sp_calculate_revenue (stored procedure)</p>
+          <pre className="text-gray-800 text-[11px] leading-relaxed whitespace-pre-wrap font-mono">{`CREATE OR REPLACE PROCEDURE sp_calculate_revenue()
+RETURNS STRING
+LANGUAGE SQL
+AS
+$$
+BEGIN
+  CREATE OR REPLACE TABLE analytics.revenue AS
+  SELECT
+    customer_id,
+    SUM(amount) AS total_revenue
+  FROM raw.orders
+  WHERE status != 'cancelled'
+  GROUP BY 1;
+  RETURN 'done';
+END;
+$$;`}</pre>
+        </div>
+        <div className="grid grid-cols-3 gap-2">
+          <div className="bg-red-50 border border-red-200 rounded-lg p-3 text-center">
+            <p className="text-red-700 text-xs font-semibold">No history</p>
+            <p className="text-red-500 text-[10px] mt-1">Who changed it? When? Why?</p>
+          </div>
+          <div className="bg-red-50 border border-red-200 rounded-lg p-3 text-center">
+            <p className="text-red-700 text-xs font-semibold">No code review</p>
+            <p className="text-red-500 text-[10px] mt-1">Changes go straight to prod</p>
+          </div>
+          <div className="bg-red-50 border border-red-200 rounded-lg p-3 text-center">
+            <p className="text-red-700 text-xs font-semibold">No rollback plan</p>
+            <p className="text-red-500 text-[10px] mt-1">"Does anyone have the old version?"</p>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="space-y-4">
+      {/* Git commit header */}
+      <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
+        <div className="bg-gray-50 border-b border-gray-200 px-4 py-2">
+          <p className="text-xs font-mono text-gray-800">
+            <span className="text-amber-600 font-semibold">a3f8c2d</span> - Miles Freeborn - 2 days ago
+          </p>
+          <p className="text-xs text-gray-600 mt-0.5">fix: update revenue calc to exclude refunded orders</p>
+        </div>
+
+        {/* Diff view */}
+        <div className="p-4">
+          <p className="text-[10px] font-mono text-gray-500 mb-2">models/marts/fct_revenue.sql</p>
+          <div className="font-mono text-[11px] leading-relaxed border border-gray-200 rounded overflow-hidden">
+            <div className="bg-gray-50 px-3 py-1 text-gray-500 text-[10px] border-b border-gray-200">@@ -5,7 +5,7 @@</div>
+            <div className="px-3 py-0.5 text-gray-600">  SELECT</div>
+            <div className="px-3 py-0.5 text-gray-600">    customer_id,</div>
+            <div className="px-3 py-0.5 text-gray-600">    SUM(amount) AS total_revenue</div>
+            <div className="px-3 py-0.5 text-gray-600">  FROM {'{{ ref(\'stg_orders\') }}'}</div>
+            <div className="bg-red-50 px-3 py-0.5 text-red-700">- WHERE status != 'cancelled'</div>
+            <div className="bg-emerald-50 px-3 py-0.5 text-emerald-700">+ WHERE status NOT IN ('cancelled', 'refunded')</div>
+            <div className="px-3 py-0.5 text-gray-600">  GROUP BY 1</div>
+          </div>
+        </div>
+      </div>
+
+      {/* History */}
+      <div className="bg-white border border-gray-200 rounded-lg p-4">
+        <p className="text-xs font-semibold text-gray-700 mb-2">History</p>
+        <div className="space-y-1.5 font-mono text-[10px]">
+          <div className="flex gap-2 text-gray-600">
+            <span className="text-amber-600 font-semibold">a3f8c2d</span>
+            <span>fix: update revenue calc to exclude refunded orders</span>
+          </div>
+          <div className="flex gap-2 text-gray-600">
+            <span className="text-amber-600 font-semibold">b7e1d4a</span>
+            <span>feat: add customer lifetime value to fct_revenue</span>
+          </div>
+          <div className="flex gap-2 text-gray-600">
+            <span className="text-amber-600 font-semibold">c92f0b3</span>
+            <span>refactor: move revenue calc from raw joins to staging refs</span>
+          </div>
+          <div className="flex gap-2 text-gray-600">
+            <span className="text-amber-600 font-semibold">d1a6e8f</span>
+            <span>feat: initial fct_revenue model</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+/* ------------------------------------------------------------------ */
+/*  Data Quality / Testing Visual                                     */
+/* ------------------------------------------------------------------ */
+
+function TestingVisual({ showDbt }) {
+  const [nodeStates, setNodeStates] = useState({
+    stg_customers: 'idle',
+    stg_orders: 'idle',
+    int_enriched: 'idle',
+    fct_orders: 'idle',
+  })
+  const timeoutsRef = useRef([])
+
+  const runBuild = () => {
+    // Clear any pending timeouts
+    timeoutsRef.current.forEach(t => clearTimeout(t))
+    timeoutsRef.current = []
+
+    // Reset
+    setNodeStates({
+      stg_customers: 'idle',
+      stg_orders: 'idle',
+      int_enriched: 'idle',
+      fct_orders: 'idle',
+    })
+
+    // stg_customers: running
+    const t1 = setTimeout(() => {
+      setNodeStates(s => ({ ...s, stg_customers: 'running', stg_orders: 'running' }))
+    }, 300)
+
+    // stg_customers: pass, stg_orders still running
+    const t2 = setTimeout(() => {
+      setNodeStates(s => ({ ...s, stg_customers: 'pass' }))
+    }, 1000)
+
+    // stg_orders: fail
+    const t3 = setTimeout(() => {
+      setNodeStates(s => ({ ...s, stg_orders: 'fail', int_enriched: 'skipped', fct_orders: 'skipped' }))
+    }, 1600)
+
+    timeoutsRef.current = [t1, t2, t3]
+  }
+
+  if (!showDbt) {
+    return (
+      <div className="space-y-3">
+        <div className="bg-white border border-gray-200 rounded-lg p-4">
+          <p className="text-gray-500 text-[10px] mb-2">-- Ad-hoc validation (run manually)</p>
+          <pre className="text-gray-800 text-[11px] leading-relaxed whitespace-pre-wrap font-mono">{`SELECT COUNT(*) FROM orders
+WHERE order_id IS NULL;
+-- 3 rows... is that bad?`}</pre>
+        </div>
+        <div className="bg-white border border-gray-200 rounded-lg p-4">
+          <pre className="text-gray-800 text-[11px] leading-relaxed whitespace-pre-wrap font-mono">{`SELECT order_id, COUNT(*)
+FROM orders GROUP BY 1
+HAVING COUNT(*) > 1;
+-- Duplicates found. Who gets paged?`}</pre>
+        </div>
+        <div className="bg-white border border-gray-200 rounded-lg p-4">
+          <pre className="text-gray-800 text-[11px] leading-relaxed whitespace-pre-wrap font-mono">{`SELECT COUNT(*) FROM orders
+WHERE status NOT IN (
+  'placed','shipped','returned'
+);
+-- Unknown statuses. Since when?`}</pre>
+        </div>
+        <div className="grid grid-cols-2 gap-2">
+          <div className="bg-red-50 border border-red-200 rounded-lg p-2 text-center">
+            <p className="text-red-700 text-[10px] font-semibold">No framework</p>
+            <p className="text-red-500 text-[9px]">Every check is hand-written</p>
+          </div>
+          <div className="bg-red-50 border border-red-200 rounded-lg p-2 text-center">
+            <p className="text-red-700 text-[10px] font-semibold">No automation</p>
+            <p className="text-red-500 text-[9px]">Someone has to remember to run these</p>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  const nodeColorMap = {
+    idle: 'bg-gray-100 border-gray-300 text-gray-500',
+    running: 'bg-blue-100 border-blue-400 text-blue-700',
+    pass: 'bg-emerald-100 border-emerald-400 text-emerald-700',
+    fail: 'bg-red-100 border-red-400 text-red-700',
+    skipped: 'bg-gray-100 border-gray-300 text-gray-400',
+  }
+
+  return (
+    <div className="flex gap-4">
+      {/* Left: YAML test definitions */}
+      <div className="flex-1 bg-white border border-gray-200 rounded-lg p-4">
+        <p className="text-xs font-semibold text-gray-700 mb-2">_stg_models.yml</p>
+        <div className="font-mono text-[11px] leading-relaxed">
+          <div><span className="text-purple-600">models</span><span className="text-gray-800">:</span></div>
+          <div>  - <span className="text-purple-600">name</span><span className="text-gray-800">:</span> <span className="text-emerald-600">stg_orders</span></div>
+          <div>    <span className="text-purple-600">columns</span><span className="text-gray-800">:</span></div>
+          <div>      - <span className="text-purple-600">name</span><span className="text-gray-800">:</span> <span className="text-emerald-600">order_id</span></div>
+          <div>        <span className="text-purple-600">data_tests</span><span className="text-gray-800">:</span></div>
+          <div>          - <span className="text-blue-600">unique</span></div>
+          <div>          - <span className="text-blue-600">not_null</span></div>
+          <div className="mt-1">      - <span className="text-purple-600">name</span><span className="text-gray-800">:</span> <span className="text-emerald-600">status</span></div>
+          <div>        <span className="text-purple-600">data_tests</span><span className="text-gray-800">:</span></div>
+          <div>          - <span className="text-blue-600">accepted_values</span><span className="text-gray-800">:</span></div>
+          <div>              <span className="text-purple-600">values</span><span className="text-gray-800">:</span></div>
+          <div>                - <span className="text-emerald-600">'placed'</span></div>
+          <div>                - <span className="text-emerald-600">'shipped'</span></div>
+          <div>                - <span className="text-emerald-600">'returned'</span></div>
+          <div className="mt-1">      - <span className="text-purple-600">name</span><span className="text-gray-800">:</span> <span className="text-emerald-600">customer_id</span></div>
+          <div>        <span className="text-purple-600">data_tests</span><span className="text-gray-800">:</span></div>
+          <div>          - <span className="text-blue-600">not_null</span></div>
+          <div>          - <span className="text-blue-600">relationships</span><span className="text-gray-800">:</span></div>
+          <div>              <span className="text-purple-600">to</span><span className="text-gray-800">:</span> <span className="text-emerald-600">ref('stg_customers')</span></div>
+          <div>              <span className="text-purple-600">field</span><span className="text-gray-800">:</span> <span className="text-emerald-600">customer_id</span></div>
+        </div>
+      </div>
+
+      {/* Right: Mini DAG with build button */}
+      <div className="flex-1 flex flex-col gap-3">
+        <button
+          onClick={runBuild}
+          className="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold px-4 py-2 rounded-lg transition-colors"
+        >
+          Run dbt build
+        </button>
+        <div className="bg-white border border-gray-200 rounded-lg p-4 flex flex-col gap-2">
+          {[
+            { key: 'stg_customers', label: 'stg_customers' },
+            { key: 'stg_orders', label: 'stg_orders' },
+            { key: 'int_enriched', label: 'int_enriched' },
+            { key: 'fct_orders', label: 'fct_orders' },
+          ].map(node => (
+            <div
+              key={node.key}
+              className={`border rounded px-3 py-2 text-xs font-mono font-semibold text-center transition-all duration-300 ${nodeColorMap[nodeStates[node.key]]}`}
+            >
+              {node.label}
+              {nodeStates[node.key] === 'pass' && ' - PASS'}
+              {nodeStates[node.key] === 'fail' && ' - FAIL'}
+              {nodeStates[node.key] === 'skipped' && ' - SKIPPED'}
+              {nodeStates[node.key] === 'running' && ' ...'}
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  )
+}
+
 /*  Main component                                                    */
 /* ------------------------------------------------------------------ */
 
@@ -587,6 +866,12 @@ export default function DbtModels() {
         return <DDLVisual showDbt={showDbt} />
       case 'lineage':
         return <LineageVisual showDbt={showDbt} />
+      case 'environments':
+        return <EnvironmentVisual showDbt={showDbt} />
+      case 'versioned':
+        return <VersionControlVisual showDbt={showDbt} />
+      case 'testing':
+        return <TestingVisual showDbt={showDbt} />
       default:
         return null
     }

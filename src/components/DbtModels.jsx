@@ -3,6 +3,13 @@ import { motion, AnimatePresence } from 'framer-motion'
 
 const advantages = [
   {
+    id: 'what_is_model',
+    title: 'What is a Model?',
+    icon: '📄',
+    custom: 'what_is_model',
+    section: 'overview',
+  },
+  {
     id: 'modularity',
     title: 'Modularity',
     icon: '🧩',
@@ -45,6 +52,143 @@ const advantages = [
     custom: 'versioned',
   },
 ]
+
+/* ------------------------------------------------------------------ */
+/*  What is a Model Visual                                             */
+/* ------------------------------------------------------------------ */
+
+function WhatIsModelVisual({ showDbt }) {
+  return (
+    <AnimatePresence mode="wait">
+      <motion.div
+        key={showDbt ? 'with' : 'without'}
+        initial={{ opacity: 0, x: showDbt ? 10 : -10 }}
+        animate={{ opacity: 1, x: 0 }}
+        exit={{ opacity: 0, x: showDbt ? -10 : 10 }}
+        transition={{ duration: 0.25 }}
+      >
+        {!showDbt ? (
+          <div className="bg-gray-50 border border-gray-200 rounded-xl p-5 space-y-4">
+            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">A traditional SQL script</p>
+            <div className="bg-white border border-gray-200 rounded-lg p-5 font-mono text-[11px] leading-relaxed">
+              <div className="text-gray-400 mb-3">-- int_enriched_orders.sql</div>
+              <div className="text-gray-700">
+                <div><span className="text-blue-600">CREATE OR REPLACE TABLE</span> analytics.int_enriched_orders <span className="text-blue-600">AS</span> (</div>
+                <div className="mt-2 ml-2"><span className="text-blue-600">SELECT</span></div>
+                <div className="ml-4">o.order_id,</div>
+                <div className="ml-4">o.customer_id,</div>
+                <div className="ml-4">o.order_date,</div>
+                <div className="ml-4">o.status,</div>
+                <div className="ml-4">p.product_name,</div>
+                <div className="ml-4">p.category,</div>
+                <div className="ml-4">p.price</div>
+                <div className="ml-2"><span className="text-blue-600">FROM</span> analytics.stg_orders o</div>
+                <div className="ml-2"><span className="text-blue-600">LEFT JOIN</span> analytics.stg_product p</div>
+                <div className="ml-4"><span className="text-blue-600">ON</span> o.product_id = p.product_id</div>
+                <div className="mt-1">);</div>
+              </div>
+            </div>
+            <div className="grid grid-cols-3 gap-3">
+              <div className="bg-white border border-gray-200 rounded-lg p-3 text-center">
+                <p className="text-xs font-semibold text-gray-700">DDL included</p>
+                <p className="text-[10px] text-gray-400 mt-0.5">CREATE TABLE is your job</p>
+              </div>
+              <div className="bg-white border border-gray-200 rounded-lg p-3 text-center">
+                <p className="text-xs font-semibold text-gray-700">Hardcoded refs</p>
+                <p className="text-[10px] text-gray-400 mt-0.5">Table names baked in</p>
+              </div>
+              <div className="bg-white border border-gray-200 rounded-lg p-3 text-center">
+                <p className="text-xs font-semibold text-gray-700">No metadata</p>
+                <p className="text-[10px] text-gray-400 mt-0.5">Just a SQL file</p>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div className="bg-gray-50 border border-gray-200 rounded-xl p-5 space-y-4">
+            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">A dbt model is a SQL SELECT that becomes a table, view, or incremental load</p>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              {/* The model */}
+              <div>
+                <div className="text-xs font-medium text-gray-500 mb-1.5 flex items-center gap-1.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                  The model file
+                </div>
+                <div className="bg-white border border-gray-200 rounded-lg p-4 font-mono text-[11px] leading-relaxed">
+                  <div className="text-gray-400 mb-2">models/intermediate/int_enriched_orders.sql</div>
+                  <div className="text-gray-700">
+                    <div className="bg-amber-50 border-l-2 border-amber-400 -ml-2 pl-2 py-0.5">
+                      <span className="text-amber-600 font-bold">{"{{ config(materialized='table') }}"}</span>
+                    </div>
+                    <div className="mt-2"><span className="text-blue-600">SELECT</span></div>
+                    <div className="ml-2">o.order_id,</div>
+                    <div className="ml-2">o.customer_id,</div>
+                    <div className="ml-2">o.order_date,</div>
+                    <div className="ml-2">o.status,</div>
+                    <div className="ml-2">p.product_name,</div>
+                    <div className="ml-2">p.category,</div>
+                    <div className="ml-2">p.price</div>
+                    <div className="bg-emerald-50 border-l-2 border-emerald-400 -ml-2 pl-2 py-0.5">
+                      <span className="text-blue-600">FROM</span> <span className="text-emerald-600 font-bold">{"{{ ref('stg_orders') }}"}</span> o
+                    </div>
+                    <div className="bg-emerald-50 border-l-2 border-emerald-400 -ml-2 pl-2 py-0.5">
+                      <span className="text-blue-600">LEFT JOIN</span> <span className="text-emerald-600 font-bold">{"{{ ref('stg_product') }}"}</span> p
+                    </div>
+                    <div className="ml-2"><span className="text-blue-600">ON</span> o.product_id = p.product_id</div>
+                  </div>
+                </div>
+              </div>
+
+              {/* What makes it a model */}
+              <div className="space-y-3">
+                <div className="text-xs font-medium text-gray-500 mb-1.5 flex items-center gap-1.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-blue-400" />
+                  What makes it a model
+                </div>
+                <div className="bg-white border border-gray-200 rounded-lg p-3">
+                  <div className="flex items-start gap-2">
+                    <span className="bg-amber-100 text-amber-700 text-[10px] font-bold px-1.5 py-0.5 rounded mt-0.5 shrink-0">config</span>
+                    <div>
+                      <p className="text-xs font-semibold text-gray-800">Materialization</p>
+                      <p className="text-[11px] text-gray-500 mt-0.5">Tells dbt how to build it: <code className="bg-gray-100 px-1 rounded text-[10px]">table</code>, <code className="bg-gray-100 px-1 rounded text-[10px]">view</code>, <code className="bg-gray-100 px-1 rounded text-[10px]">incremental</code>, or <code className="bg-gray-100 px-1 rounded text-[10px]">ephemeral</code>. dbt generates the DDL for you.</p>
+                    </div>
+                  </div>
+                </div>
+                <div className="bg-white border border-gray-200 rounded-lg p-3">
+                  <div className="flex items-start gap-2">
+                    <span className="bg-emerald-100 text-emerald-700 text-[10px] font-bold px-1.5 py-0.5 rounded mt-0.5 shrink-0">ref()</span>
+                    <div>
+                      <p className="text-xs font-semibold text-gray-800">Dependencies</p>
+                      <p className="text-[11px] text-gray-500 mt-0.5">References other models by name. dbt resolves the schema at compile time and builds them in the right order.</p>
+                    </div>
+                  </div>
+                </div>
+                <div className="bg-white border border-gray-200 rounded-lg p-3">
+                  <div className="flex items-start gap-2">
+                    <span className="bg-blue-100 text-blue-700 text-[10px] font-bold px-1.5 py-0.5 rounded mt-0.5 shrink-0">SELECT</span>
+                    <div>
+                      <p className="text-xs font-semibold text-gray-800">Just SQL</p>
+                      <p className="text-[11px] text-gray-500 mt-0.5">No CREATE TABLE, no DDL. You write the transformation logic. dbt handles the rest.</p>
+                    </div>
+                  </div>
+                </div>
+                <div className="bg-white border border-gray-200 rounded-lg p-3">
+                  <div className="flex items-start gap-2">
+                    <span className="bg-purple-100 text-purple-700 text-[10px] font-bold px-1.5 py-0.5 rounded mt-0.5 shrink-0">file</span>
+                    <div>
+                      <p className="text-xs font-semibold text-gray-800">One model = one file</p>
+                      <p className="text-[11px] text-gray-500 mt-0.5">Each model lives in its own .sql file inside your dbt project. Testable, documented, and version controlled.</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+      </motion.div>
+    </AnimatePresence>
+  )
+}
 
 /* ------------------------------------------------------------------ */
 /*  DAG helper components                                             */
@@ -852,12 +996,14 @@ WHERE status NOT IN (
 /* ------------------------------------------------------------------ */
 
 export default function DbtModels() {
-  const [activeId, setActiveId] = useState('modularity')
+  const [activeId, setActiveId] = useState('what_is_model')
   const [showDbt, setShowDbt] = useState(true)
   const active = advantages.find(a => a.id === activeId)
 
   const renderCustomVisual = () => {
     switch (active.custom) {
+      case 'what_is_model':
+        return <WhatIsModelVisual showDbt={showDbt} />
       case 'modularity':
         return <ModularityVisual showDbt={showDbt} />
       case 'reusable':
@@ -884,7 +1030,33 @@ export default function DbtModels() {
           {/* Left sidebar: feature buttons */}
           <div className="lg:w-56 shrink-0 bg-gray-50 border-b lg:border-b-0 lg:border-r border-gray-200/60 p-3">
             <div className="flex lg:flex-col gap-1.5 overflow-x-auto lg:overflow-x-visible">
-              {advantages.map((adv) => {
+              {/* What is a Model - top section */}
+              {advantages.filter(a => a.section === 'overview').map((adv) => {
+                const isActive = activeId === adv.id
+                return (
+                  <button
+                    key={adv.id}
+                    onClick={() => setActiveId(adv.id)}
+                    className={`flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm font-semibold transition-all duration-150 whitespace-nowrap text-left w-full ${
+                      isActive
+                        ? 'bg-white text-gray-900 shadow-sm ring-1 ring-gray-200'
+                        : 'text-gray-500 hover:bg-white/60 hover:text-gray-700'
+                    }`}
+                  >
+                    <span className="text-base">{adv.icon}</span>
+                    <span>{adv.title}</span>
+                  </button>
+                )
+              })}
+
+              {/* Divider */}
+              <div className="hidden lg:block my-1.5">
+                <div className="border-t border-gray-200" />
+                <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mt-2 mb-1 px-1">Advantages</p>
+              </div>
+
+              {/* Benefits */}
+              {advantages.filter(a => a.section !== 'overview').map((adv) => {
                 const isActive = activeId === adv.id
                 return (
                   <button

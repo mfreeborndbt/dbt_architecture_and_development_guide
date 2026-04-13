@@ -24,7 +24,7 @@ import StateAwareOrchestration from './components/StateAwareOrchestration'
 
 const topTabs = [
   { key: 'architecture', label: 'dbt Architecture & Setup' },
-  { key: 'models', label: 'dbt Model Advantages' },
+  { key: 'models', label: 'dbt Models' },
   { key: 'development', label: 'dbt Development Workflow' },
   { key: 'orchestration', label: 'dbt Orchestration' },
 ]

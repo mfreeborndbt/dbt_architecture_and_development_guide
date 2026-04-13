@@ -38,7 +38,7 @@ const CATEGORIES = [
     description: 'Tells dbt where to write its output tables.',
     fields: [
       { name: 'Database', value: 'DATA_ENGINEERING', hint: 'The logical database dbt writes models into' },
-      { name: 'Schema',   value: 'PRODUCTION',       hint: 'Default schema — dbt can override per model' },
+      { name: 'Schema',   value: 'PRODUCTION',       hint: 'Default schema. dbt can override per model' },
     ],
   },
   {
@@ -159,7 +159,7 @@ export default function EnvironmentsSection() {
               name: 'Development',
               badge: 'DEV',
               badgeColor: 'bg-blue-100 text-blue-700',
-              desc: 'Personal sandbox — each developer gets their own schema. Safe to break things.',
+              desc: 'Personal sandbox. Each developer gets their own schema. Safe to break things.',
               schema: 'dev.dbt_<username>',
               schemaColor: 'text-blue-600',
             },

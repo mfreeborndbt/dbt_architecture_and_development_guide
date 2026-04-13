@@ -436,8 +436,8 @@ function DevelopStep3() {
             <div>
               <p className="text-sm font-semibold text-amber-800">Change indicators</p>
               <p className="text-xs text-amber-700 mt-0.5">
-                <strong className="text-green-700">✦ NEW</strong> — file was added on this branch.{' '}
-                <strong className="text-amber-600">M</strong> — file was modified. Only these files are included in your commit.
+                <strong className="text-green-700">✦ NEW</strong>: file was added on this branch.{' '}
+                <strong className="text-amber-600">M</strong>: file was modified. Only these files are included in your commit.
               </p>
             </div>
           </div>
@@ -664,7 +664,7 @@ function SchemaHierarchy() {
           'fct_orders_with_customer_details',
         ].map(t => (
           <div key={t} className="flex items-center gap-2 text-xs text-gray-400 italic">
-            <span>—</span>
+            <span>-</span>
             <span>{t}</span>
           </div>
         ))}
@@ -720,7 +720,7 @@ function QAStep1() {
           <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Isolated schema in the data platform</p>
           <SchemaHierarchy />
           <p className="text-xs text-gray-500 leading-relaxed">
-            The schema is empty at first. The CI job will build every model into it — giving you a clean, verifiable copy of your changes in isolation.
+            The schema is empty at first. The CI job will build every model into it, giving you a clean, verifiable copy of your changes in isolation.
           </p>
         </div>
       </div>
@@ -729,13 +729,15 @@ function QAStep1() {
 }
 
 function SelectiveDAG({ changedIds = [], runIds = [], uid = 'a', showDeferralHighlight = false }) {
+  const [hoverInt, setHoverInt] = useState(false)
+  const [hoverBox, setHoverBox] = useState(false)
   const nodes = [
     { id: 0, x: 5,   y: 10,  w: 92, h: 36, lines: ['stg_customers'] },
     { id: 1, x: 5,   y: 58,  w: 92, h: 36, lines: ['stg_geoinfo'] },
     { id: 2, x: 5,   y: 116, w: 92, h: 36, lines: ['stg_orders'] },
     { id: 3, x: 5,   y: 164, w: 92, h: 36, lines: ['stg_product'] },
     { id: 4, x: 155, y: 30,  w: 114, h: 36, lines: ['int_enriched_', 'customer'] },
-    { id: 5, x: 155, y: 122, w: 114, h: 36, lines: ['int_enriched_', 'orders'] },
+    { id: 5, x: 155, y: 122, w: 114, h: 36, lines: ['int_enriched_', 'orders'], hoverable: true },
     { id: 6, x: 332, y: 76,  w: 144, h: 36, lines: ['fct_orders_with_', 'customers_details'] },
   ]
   const edges = [[0,4],[1,4],[2,5],[3,5],[4,6],[5,6]]
@@ -778,42 +780,64 @@ function SelectiveDAG({ changedIds = [], runIds = [], uid = 'a', showDeferralHig
         )
       })}
 
-      {nodes.map(n => {
-        const run = isRun(n.id), changed = isChanged(n.id)
-        const fill   = run ? '#dcfce7' : '#f3f4f6'
-        const stroke = run ? '#16a34a' : '#d1d5db'
-        const tColor = run ? '#15803d' : '#9ca3af'
-        return (
-          <g key={n.id}>
-            <rect x={n.x} y={n.y} width={n.w} height={n.h} rx="7"
-              fill={fill} stroke={stroke} strokeWidth={changed ? 2.5 : 1.5}
-              strokeDasharray={changed ? '5 3' : undefined} />
-            {n.lines.length === 1
-              ? <text x={n.x + n.w/2} y={n.y + n.h/2 + 4} fontSize="9" textAnchor="middle"
-                  fontFamily="monospace" fill={tColor} fontWeight="700">{n.lines[0]}</text>
-              : <>
-                  <text x={n.x + n.w/2} y={n.y + n.h/2 - 2} fontSize="9" textAnchor="middle"
-                    fontFamily="monospace" fill={tColor} fontWeight="700">{n.lines[0]}</text>
-                  <text x={n.x + n.w/2} y={n.y + n.h/2 + 11} fontSize="9" textAnchor="middle"
-                    fontFamily="monospace" fill={tColor} fontWeight="700">{n.lines[1]}</text>
-                </>
-            }
-          </g>
-        )
-      })}
-
+      {/* Blue dashed box around stg_orders + stg_product only (deferred inputs) */}
       {showDeferralHighlight && (
-        <g>
-          {/* Blue dashed box around stg_orders + stg_product (deferred inputs) */}
+        <g onMouseEnter={() => setHoverBox(true)} onMouseLeave={() => setHoverBox(false)} style={{ cursor: 'pointer' }}>
           <rect x="0" y="106" width="102" height="102" rx="8"
-            fill="rgba(219,234,254,0.35)" stroke="#3b82f6" strokeWidth="2" strokeDasharray="6 3" />
-          {/* Curved arrow from bottom of blue box down toward code panels below */}
+            fill={hoverBox ? 'rgba(219,234,254,0.55)' : 'rgba(219,234,254,0.35)'}
+            stroke="#3b82f6" strokeWidth={hoverBox ? 2.5 : 2} strokeDasharray="6 3"
+            style={{ transition: 'fill 0.2s, stroke-width 0.2s, filter 0.2s', filter: hoverBox ? 'drop-shadow(0 3px 8px rgba(59,130,246,0.3))' : 'none' }}
+          />
           <path d="M 51 210 C 51 245 51 258 51 288"
             stroke="#3b82f6" strokeWidth="1.5" fill="none" strokeDasharray="4 2"
             markerEnd={`url(#defr-${uid})`} />
           <text x="60" y="248" fontSize="10" fill="#3b82f6" fontFamily="sans-serif" fontWeight="600">inputs read from PROD</text>
         </g>
       )}
+
+      {nodes.map(n => {
+        const run = isRun(n.id), changed = isChanged(n.id)
+        const isHoverTarget = n.hoverable
+        const hovered = isHoverTarget && hoverInt
+        const fill   = run ? '#dcfce7' : '#f3f4f6'
+        const stroke = run ? '#16a34a' : '#d1d5db'
+        const tColor = run ? '#15803d' : '#9ca3af'
+        return (
+          <g key={n.id}
+            onMouseEnter={() => isHoverTarget && setHoverInt(true)}
+            onMouseLeave={() => isHoverTarget && setHoverInt(false)}
+            style={{ cursor: isHoverTarget ? 'pointer' : 'default' }}
+          >
+            <rect x={n.x} y={n.y} width={n.w} height={n.h} rx="7"
+              fill={fill} stroke={stroke}
+              strokeWidth={changed ? 2.5 : 1.5}
+              strokeDasharray={changed ? '5 3' : undefined}
+              style={{
+                transition: 'transform 0.2s, filter 0.2s',
+                transformOrigin: `${n.x + n.w/2}px ${n.y + n.h/2}px`,
+                transform: hovered ? 'scale(1.08)' : 'scale(1)',
+                filter: hovered ? 'drop-shadow(0 4px 10px rgba(22,163,74,0.35))' : 'none',
+              }}
+            />
+            {n.lines.length === 1
+              ? <text x={n.x + n.w/2} y={n.y + n.h/2 + 4} fontSize="9" textAnchor="middle"
+                  fontFamily="monospace" fill={tColor} fontWeight="700"
+                  style={{ transition: 'transform 0.2s', transformOrigin: `${n.x + n.w/2}px ${n.y + n.h/2}px`, transform: hovered ? 'scale(1.08)' : 'scale(1)' }}
+                >{n.lines[0]}</text>
+              : <>
+                  <text x={n.x + n.w/2} y={n.y + n.h/2 - 2} fontSize="9" textAnchor="middle"
+                    fontFamily="monospace" fill={tColor} fontWeight="700"
+                    style={{ transition: 'transform 0.2s', transformOrigin: `${n.x + n.w/2}px ${n.y + n.h/2}px`, transform: hovered ? 'scale(1.08)' : 'scale(1)' }}
+                  >{n.lines[0]}</text>
+                  <text x={n.x + n.w/2} y={n.y + n.h/2 + 11} fontSize="9" textAnchor="middle"
+                    fontFamily="monospace" fill={tColor} fontWeight="700"
+                    style={{ transition: 'transform 0.2s', transformOrigin: `${n.x + n.w/2}px ${n.y + n.h/2}px`, transform: hovered ? 'scale(1.08)' : 'scale(1)' }}
+                  >{n.lines[1]}</text>
+                </>
+            }
+          </g>
+        )
+      })}
     </svg>
   )
 }
@@ -878,7 +902,7 @@ function QAStep2() {
       <div className="flex items-start gap-4">
         <div className="shrink-0 w-8 h-8 rounded-full bg-amber-500 text-white flex items-center justify-center font-bold text-sm">2</div>
         <div>
-          <h4 className="font-bold text-gray-900 text-lg leading-tight">Deferral + Slim CI — Run Only What Changed</h4>
+          <h4 className="font-bold text-gray-900 text-lg leading-tight">Deferral + Slim CI: Run Only What Changed</h4>
           <p className="text-gray-500 text-sm mt-1">
             The CI job uses two techniques together: <strong>deferral</strong> (read unchanged upstream results from production instead of rebuilding them) and <strong>slim CI</strong> (only build and test the changed model and its downstream dependents).
           </p>
@@ -893,7 +917,7 @@ function QAStep2() {
           <div className="space-y-1.5">
             <div className="flex items-center gap-2">
               <span className="w-5 h-5 rounded-full bg-red-100 border border-red-300 text-red-600 text-xs flex items-center justify-center font-bold shrink-0">✗</span>
-              <p className="text-xs font-semibold text-gray-600">Without slim CI — rebuilds all 7</p>
+              <p className="text-xs font-semibold text-gray-600">Without slim CI: rebuilds all 7</p>
             </div>
             <div className="border border-red-200 rounded-xl p-3 bg-red-50">
               <SelectiveDAG changedIds={[5]} runIds={ALL} uid="full" />
@@ -904,7 +928,7 @@ function QAStep2() {
           <div className="space-y-1.5">
             <div className="flex items-center gap-2">
               <span className="w-5 h-5 rounded-full bg-green-100 border border-green-300 text-green-600 text-xs flex items-center justify-center font-bold shrink-0">✓</span>
-              <p className="text-xs font-semibold text-gray-600">With slim CI — builds changed + downstream only</p>
+              <p className="text-xs font-semibold text-gray-600">With slim CI: builds changed + downstream only</p>
             </div>
             <div className="border border-green-200 rounded-xl p-3 bg-green-50 overflow-visible">
               <SelectiveDAG changedIds={[5]} runIds={SLIM} uid="slim" showDeferralHighlight />
@@ -914,7 +938,7 @@ function QAStep2() {
 
         {/* Code panels — full width, green left border ties to "With slim CI" */}
         <div className="border-l-4 border-green-400 pl-4 space-y-3 mt-2">
-          <p className="text-xs font-semibold text-green-600 uppercase tracking-wider">Deferral — how ref() resolves to production at runtime</p>
+          <p className="text-xs font-semibold text-green-600 uppercase tracking-wider">Deferral: how ref() resolves to production at runtime</p>
           <div className="flex items-stretch gap-3">
             <div className="flex-1 min-w-0 border border-gray-200 rounded-lg p-3 bg-gray-50 text-xs font-mono text-gray-700 leading-relaxed overflow-x-auto">
               <div className="text-gray-400 mb-1">int_enriched_orders.sql</div>
@@ -1150,7 +1174,7 @@ function QAStep3() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Left — dbt Platform UI */}
         <div className="space-y-3">
-          <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">dbt Platform UI — Compare tab</p>
+          <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">dbt Platform UI: Compare tab</p>
           <DataDiffUI />
           <ModelDiffDetail />
         </div>
@@ -1385,7 +1409,7 @@ function ProductionStep1() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Left — dbt Platform UI */}
         <div className="space-y-3">
-          <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">dbt Platform UI — Job settings</p>
+          <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">dbt Platform UI: Job settings</p>
           <ProductionJobUI />
         </div>
 
@@ -1524,8 +1548,8 @@ function GitPanel() {
 
 function DbtPanel() {
   const waves = [
-    { label: 'Wave 1 — parallel', models: ['stg_customers', 'stg_orders'], color: 'bg-orange-100 text-orange-800 border-orange-200' },
-    { label: 'Wave 2 — parallel', models: ['int_enriched_customer', 'int_enriched_orders'], color: 'bg-orange-100 text-orange-800 border-orange-200' },
+    { label: 'Wave 1 (parallel)', models: ['stg_customers', 'stg_orders'], color: 'bg-orange-100 text-orange-800 border-orange-200' },
+    { label: 'Wave 2 (parallel)', models: ['int_enriched_customer', 'int_enriched_orders'], color: 'bg-orange-100 text-orange-800 border-orange-200' },
     { label: 'Wave 3',            models: ['fct_orders_with_customers_details'],             color: 'bg-orange-100 text-orange-800 border-orange-200' },
   ]
   const compiled = [

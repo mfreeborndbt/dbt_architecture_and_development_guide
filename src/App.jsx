@@ -257,7 +257,7 @@ export default function App() {
         <div className="section-container py-10 md:py-14 text-center">
           <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
             <h1 className="text-3xl md:text-4xl font-bold text-white mb-4 tracking-tight">
-              The dbt Guide
+              The dbt Interactive Guide
             </h1>
 
             {/* Top-level navigation tabs */}

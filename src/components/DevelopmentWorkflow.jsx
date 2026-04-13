@@ -549,12 +549,24 @@ function PRDiagram() {
       <path d="M 240 35 C 280 35 290 80 310 105" stroke="#6366f1" strokeWidth="3" fill="none" strokeLinecap="round" />
 
       {/* merge point dot on main */}
-      <circle cx="310" cy="105" r="7" fill="#6366f1" stroke="white" strokeWidth="2" />
-      <text x="305" y="109" fontSize="9" fontWeight="800" fill="white" fontFamily="ui-sans-serif, system-ui, sans-serif">✓</text>
+      <g
+        onMouseEnter={e => { e.currentTarget.style.transform = 'scale(1.3)'; e.currentTarget.style.filter = 'drop-shadow(0 2px 6px rgba(99,102,241,0.4))' }}
+        onMouseLeave={e => { e.currentTarget.style.transform = 'scale(1)'; e.currentTarget.style.filter = 'none' }}
+        style={{ cursor: 'pointer', transition: 'transform 0.2s, filter 0.2s', transformOrigin: '310px 105px' }}
+      >
+        <circle cx="310" cy="105" r="7" fill="#6366f1" stroke="white" strokeWidth="2" />
+        <text x="305" y="109" fontSize="9" fontWeight="800" fill="white" fontFamily="ui-sans-serif, system-ui, sans-serif">✓</text>
+      </g>
 
       {/* PR arrow label - centered on the dashed line */}
-      <rect x="170" y="25" width="70" height="20" rx="5" fill="#fef3c7" stroke="#f59e0b" strokeWidth="1.5" />
-      <text x="175" y="39" fontSize="9" fontWeight="600" fill="#92400e" fontFamily="ui-sans-serif, system-ui, sans-serif">Pull Request</text>
+      <g
+        onMouseEnter={e => { e.currentTarget.style.transform = 'scale(1.1)'; e.currentTarget.style.filter = 'drop-shadow(0 2px 6px rgba(245,158,11,0.4))' }}
+        onMouseLeave={e => { e.currentTarget.style.transform = 'scale(1)'; e.currentTarget.style.filter = 'none' }}
+        style={{ cursor: 'pointer', transition: 'transform 0.2s, filter 0.2s', transformOrigin: '205px 35px' }}
+      >
+        <rect x="170" y="25" width="70" height="20" rx="5" fill="#fef3c7" stroke="#f59e0b" strokeWidth="1.5" />
+        <text x="205" y="39" textAnchor="middle" fontSize="9" fontWeight="600" fill="#92400e" fontFamily="ui-sans-serif, system-ui, sans-serif">Pull Request</text>
+      </g>
 
       {/* main node */}
       <g

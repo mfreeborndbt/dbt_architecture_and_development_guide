@@ -286,7 +286,8 @@ export default function InteractiveArchitecture() {
                     <p className="text-xs text-gray-500 text-center font-semibold mb-1">Transformation Layer</p>
                     <p className="text-sm text-gray-700 text-center">
                       Develops code <span className="text-blue-500 font-medium">(git)</span><br />
-                      Creates and orchestrates execution plan <span className="text-green-600 font-medium">(data platform)</span>
+                      Creates and orchestrates execution plan <span className="text-green-600 font-medium">(data platform)</span><br />
+                      Metadata management
                     </p>
                   </div>
 
@@ -338,7 +339,7 @@ export default function InteractiveArchitecture() {
                 <p className="text-gray-600 mb-10">dbt converts your model into executable SQL, then sends it to your warehouse</p>
 
                 {/* Three-column horizontal layout */}
-                <div className="grid grid-cols-1 lg:grid-cols-[5fr_3fr_5fr] gap-6 items-center">
+                <div className="grid grid-cols-1 lg:grid-cols-[1fr_auto_1fr] gap-6 items-stretch">
                   {/* Column 1: dbt Section */}
                   <motion.div
                     initial={{ opacity: 0, x: -20 }}
@@ -352,9 +353,9 @@ export default function InteractiveArchitecture() {
                     <div className="mb-4">
                       <p className="text-xs font-semibold text-blue-800 mb-2">Your Model:</p>
                       <motion.div
-                        whileHover={{ scale: 1.08 }}
+                        whileHover={{ scale: 1.03, y: -2 }}
                         transition={{ type: "spring", stiffness: 300, damping: 20 }}
-                        className="bg-white border border-blue-300 rounded p-3 font-mono text-xs cursor-pointer"
+                        className="bg-white border border-blue-300 rounded p-4 py-5 font-mono text-xs cursor-pointer transition-shadow hover:shadow-md"
                       >
                         <div className="text-gray-800 space-y-1.5">
                           <div className="text-gray-600">-- int_customers_by_region.sql</div>
@@ -369,7 +370,7 @@ export default function InteractiveArchitecture() {
                     <motion.div
                       animate={{ y: [0, 4, 0] }}
                       transition={{ duration: 2, repeat: Infinity }}
-                      className="text-center text-xl font-bold text-blue-600 my-2"
+                      className="text-center text-xl font-bold text-blue-600 my-4"
                     >
                       ↓
                     </motion.div>
@@ -378,9 +379,9 @@ export default function InteractiveArchitecture() {
                     <div>
                       <p className="text-xs font-semibold text-blue-800 mb-2">Becomes:</p>
                       <motion.div
-                        whileHover={{ scale: 1.08 }}
+                        whileHover={{ scale: 1.03, y: -2 }}
                         transition={{ type: "spring", stiffness: 300, damping: 20 }}
-                        className="bg-white border border-green-300 rounded p-3 font-mono text-xs overflow-x-auto cursor-pointer"
+                        className="bg-white border border-green-300 rounded p-4 py-5 font-mono text-xs overflow-x-auto cursor-pointer transition-shadow hover:shadow-md"
                       >
                         <div className="text-gray-800 space-y-0.5">
                           <div><span className="text-blue-600">create table</span></div>
@@ -394,7 +395,7 @@ export default function InteractiveArchitecture() {
 
                   {/* Column 2: Arrow to Warehouse with Icon */}
                   <motion.div
-                    className="flex flex-col items-center justify-center h-full gap-4"
+                    className="flex flex-col items-center justify-center gap-4 px-4"
                   >
                     <motion.div
                       animate={{ x: [0, 8, 0] }}
@@ -414,22 +415,62 @@ export default function InteractiveArchitecture() {
                     initial={{ opacity: 0, x: 20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 0.2 }}
-                    whileHover={{ scale: 1.08 }}
-                    className="bg-gradient-to-br from-green-50 to-green-100/50 border border-green-200/60 rounded-xl p-6 cursor-pointer"
+                    className="bg-gradient-to-br from-green-50 to-green-100/50 border border-green-200/60 rounded-xl p-6"
                   >
-                    <h4 className="text-sm font-bold text-green-900 mb-4 uppercase tracking-wide">Data Warehouse</h4>
+                    <h4 className="text-sm font-bold text-green-900 mb-4 uppercase tracking-wide">Data Platform</h4>
 
-                    <div className="bg-white border border-green-300 rounded p-4 font-mono text-xs">
-                      <div className="text-green-900 space-y-1">
-                        <div className="font-bold">🏢 analytics</div>
-                        <div className="ml-3 font-bold">📁 production</div>
-                        <div className="ml-6 text-blue-700">📋 stg_customers</div>
-                        <div className="ml-6 text-blue-700">📋 stg_orders</div>
-                        <div className="ml-6 bg-blue-100 border-l-2 border-blue-500 px-2 py-1 rounded font-bold text-blue-700">📋 int_customers_by_region</div>
-                        <div className="ml-6 text-purple-700">📋 int_orders_with_items</div>
-                        <div className="ml-6 text-emerald-700">📋 fct_orders</div>
+                    {/* Execution Plan */}
+                    <motion.div
+                      whileHover={{ scale: 1.03, y: -2 }}
+                      transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                      className="bg-white border border-green-300 rounded-lg p-3 cursor-pointer transition-shadow hover:shadow-md mb-2"
+                    >
+                      <p className="text-xs font-bold text-gray-700 mb-2">dbt Execution Plan</p>
+                      <div className="space-y-1.5 text-xs font-mono">
+                        <div className="flex gap-1.5">
+                          <span className="bg-blue-50 border border-blue-200 text-blue-700 px-2 py-0.5 rounded">stg_customers</span>
+                          <span className="bg-blue-50 border border-blue-200 text-blue-700 px-2 py-0.5 rounded">stg_orders</span>
+                        </div>
+                        <div className="text-center text-gray-400 text-xs font-medium">then</div>
+                        <div className="flex gap-1.5">
+                          <span className="bg-blue-100 border border-blue-300 text-blue-800 px-2 py-0.5 rounded font-bold">int_customers_by_region</span>
+                        </div>
+                        <div className="text-center text-gray-400 text-xs font-medium">then</div>
+                        <div className="flex gap-1.5">
+                          <span className="bg-blue-50 border border-blue-200 text-blue-700 px-2 py-0.5 rounded">fct_orders</span>
+                        </div>
                       </div>
-                    </div>
+                    </motion.div>
+
+                    {/* Arrow down */}
+                    <motion.div
+                      animate={{ y: [0, 4, 0] }}
+                      transition={{ duration: 2, repeat: Infinity }}
+                      className="text-center text-lg font-bold text-green-600 my-1"
+                    >
+                      ↓
+                    </motion.div>
+
+                    {/* Objects in Data Platform */}
+                    <motion.div
+                      whileHover={{ scale: 1.03, y: -2 }}
+                      transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                      className="bg-white border border-green-300 rounded-lg p-3 cursor-pointer transition-shadow hover:shadow-md"
+                    >
+                      <p className="text-xs font-bold text-gray-700 mb-1.5">Objects in Data Platform</p>
+                      <div className="space-y-0.5 font-mono text-xs">
+                        <div className="flex items-center gap-1.5 text-green-900">
+                          <span>🏢</span><span className="font-bold">analytics</span>
+                        </div>
+                        <div className="flex items-center gap-1.5 ml-3 text-green-900">
+                          <span>📁</span><span className="font-bold">production</span>
+                        </div>
+                        <div className="ml-6 text-blue-700 px-2 py-0.5">📋 stg_customers</div>
+                        <div className="ml-6 text-blue-700 px-2 py-0.5">📋 stg_orders</div>
+                        <div className="ml-6 bg-blue-100 border-l-2 border-blue-500 px-2 py-1 rounded font-bold text-blue-700">📋 int_customers_by_region</div>
+                        <div className="ml-6 text-blue-700 px-2 py-0.5">📋 fct_orders</div>
+                      </div>
+                    </motion.div>
                   </motion.div>
                 </div>
               </div>

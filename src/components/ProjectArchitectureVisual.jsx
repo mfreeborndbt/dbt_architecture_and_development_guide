@@ -427,7 +427,7 @@ function CodeView({ tab }) {
               className="mt-6 border-l-2 border-cyan-500 pl-3 text-xs text-gray-400"
             >
               <span className="text-cyan-400 font-semibold">One codebase.</span>
-              {' '}The SQL didn't change — only the destination schema.
+              {' '}The SQL didn't change, only the destination schema.
               {' '}<span className="text-cyan-400 font-mono">{`{{ ref() }}`}</span>
               {' '}compiled to <span className="text-cyan-300 font-mono">{tab.prefix}</span>.
             </motion.div>

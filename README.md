@@ -1,76 +1,99 @@
-# dbt Story - An Interactive Educational Website
+# The dbt Interactive Guide
 
-A beautiful, interactive website that tells the story of how dbt works. Built for data professionals who want to understand dbt's core concepts, architecture, and development workflow.
+An interactive educational website that walks through how dbt works, from architecture and models to development workflows and orchestration. Built for data professionals learning dbt.
 
-## Overview
+**Live site:** [mfreeborndbt.github.io/dbt_interactive_guide](https://mfreeborndbt.github.io/dbt_interactive_guide/)
 
-This website guides users through:
+## What's Inside
 
-1. **Core Concepts** - Understanding dbt's foundational ideas
-   - Project Architecture: How data flows through dbt
-   - Environments: Development, testing, and production separation
-   - Runtime Architecture: What happens when dbt runs
+The guide is organized into four main sections, accessible via tabs at the top:
 
-2. **Development & Deployment Workflow** - The complete journey from code to production
-   - Step 1: Developer creates features in dev environment
-   - Step 2: CI/CD validation and testing
-   - Step 3: Production deployment workflow
+### 1. dbt Architecture & Setup
+- **Full Architecture** overview showing how Git, dbt, and your data platform connect
+- **Git ↔ dbt** bidirectional sync walkthrough (pull, write, push)
+- **dbt → Data Platform** compilation and execution flow with execution plan visualization
+- **Environments & dbt Code** showing how environments define where code runs
+- **Project Architecture** with lineage and code views across Logical, Dev, QA, and Prod environments
 
-## Features
+### 2. dbt Models
+Interactive comparison of traditional SQL vs dbt models, with a "Without dbt / With dbt" toggle:
+- **What is a Model?** - SQL SELECT that becomes a table, view, or incremental load
+- **Modularity** - Break monolith scripts into reusable, testable pieces (with DAG visualization)
+- **Reusable Logic** - Define macros once, call them everywhere (phone normalization example)
+- **Abstracts DDL/DML** - Write SELECT, dbt generates MERGE (incremental materialization example)
+- **Data Quality Framework** - YAML test definitions with animated build simulator
+- **Lineage & Documentation** - Model lineage, column lineage with transformation tags, YAML docs
+- **Environment Aware** - One codebase, different schemas per environment (Logical/Dev/QA/Prod tabs)
+- **Version Controlled** - Git diff view showing change history and audit trail
 
-- 🎨 **Modern, Clean Design** - Inspired by contemporary data tools
-- ⚡ **Interactive Components** - Smooth animations and state management
-- 📱 **Fully Responsive** - Works beautifully on all device sizes
-- 🎯 **Educational Focus** - Designed for data people new to dbt
-- 🚀 **Performance Optimized** - Built with Vite for fast development
+### 3. dbt Development Workflow
+- **Common Development Workflow** - Feature branch to production flow (5-step SVG diagram)
+- **Development Process** - Step-by-step walkthrough across Develop, QA, and Production phases
+  - Credential setup and branching
+  - Code writing and committing
+  - Pull requests with CI/CD
+  - Deferral and slim CI
+  - Data diffing and peer review
+  - Production deployment
+
+### 4. dbt Orchestration
+Three phases with interactive simulators:
+
+**Phase 1: Dependency Management**
+- Manual orchestration comparison (Snowflake Tasks, Databricks Notebooks, Airflow)
+- The ref() function explained with side-by-side SQL comparison
+- Animated DAG build showing models executing in correct order
+
+**Phase 2: Automated Testing**
+- Tests as SQL queries (unique, not_null, accepted_values, relationships)
+- Test configuration in YAML (basic and advanced)
+- dbt build simulator with pass/fail scenarios showing downstream blocking
+
+**Phase 3: State-Aware Orchestration**
+- Pre-SAO default (rebuild everything, wasted compute highlighted)
+- SAO default (source freshness, reused models)
+- Advanced configuration (update: all blocking behavior)
 
 ## Tech Stack
 
-- **React 18** - UI framework
-- **Vite** - Build tool and dev server
-- **Tailwind CSS** - Utility-first styling
-- **Framer Motion** - Smooth animations and interactions
-- **Lucide React** - Beautiful icons
+- **React 19** with hooks
+- **Vite 8** for build and dev server
+- **Tailwind CSS 4** for styling
+- **Framer Motion 12** for animations
+- **Lucide React** for icons
 
 ## Getting Started
 
 ```bash
-# Navigate to the project directory
-cd dbt-story
-
-# Install dependencies
 npm install
-
-# Start the development server
 npm run dev
 ```
 
-The site will be available at `http://localhost:5173`
-
-## Build for Production
+## Build and Deploy
 
 ```bash
 npm run build
 ```
 
-## Customization
+Deploys automatically to GitHub Pages on push to `main` via GitHub Actions.
 
-Edit files in `src/components/` to customize:
-- Content and text
-- Colors in `tailwind.config.js`
-- Animations in component files
+## Project Structure
 
-## Next Steps
-
-1. Add visual diagrams from your reference screenshots
-2. Create interactive data flow visualizations
-3. Add real dbt artifact examples
-4. Build environment simulator
-5. Add knowledge assessments
-
-## References
-
-- [dbt Documentation](https://docs.getdbt.com)
-- [dbt Labs](https://www.getdbt.com)
-- [Tailwind CSS](https://tailwindcss.com)
-- [Framer Motion](https://www.framer.com/motion)
+```
+src/
+  App.jsx                          # Main app with 4 top-level tabs
+  components/
+    InteractiveArchitecture.jsx    # Architecture diagrams and flows
+    EnvironmentsSection.jsx        # Environment configuration cards
+    ProjectArchitectureVisual.jsx  # Lineage and code view with env tabs
+    TypicalWorkflow.jsx            # 5-step workflow SVG diagram
+    DevelopmentWorkflow.jsx        # Full dev process walkthrough
+    DbtModels.jsx                  # Model advantages with custom visuals
+    PreDbtOrchestration.jsx        # Manual orchestration comparison
+    HowDbtWorks.jsx                # ref() function comparison
+    DbtRunAnimation.jsx            # Animated DAG build (dbt run)
+    TestingExplanation.jsx         # Test SQL examples
+    SettingUpTests.jsx             # YAML test configuration
+    DbtBuildSimulator.jsx          # dbt build with test pass/fail
+    StateAwareOrchestration.jsx    # SAO scenarios simulator
+```

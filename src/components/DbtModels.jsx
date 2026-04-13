@@ -241,86 +241,133 @@ function DagEdge({ x1, y1, x2, y2, color = '#10b981' }) {
 /* ------------------------------------------------------------------ */
 
 function ModularityVisual({ showDbt }) {
-  if (!showDbt) {
-    return (
-      <div className="space-y-4">
-        <div className="bg-gray-900 rounded-lg p-4 border border-red-500/30">
-          <p className="text-red-400 text-xs font-semibold mb-2">report_a.sql</p>
-          <pre className="text-gray-400 text-[11px] leading-relaxed whitespace-pre-wrap">{`SELECT c.id, c.name,
-  o.order_id, o.amount, o.order_date,
-  p.product_name
-FROM raw.customers c
-JOIN raw.orders o ON c.id = o.customer_id
-JOIN raw.products p ON o.product_id = p.id
-WHERE c.is_active = true
-  AND o.status != 'cancelled'`}</pre>
-        </div>
-        <div className="bg-gray-900 rounded-lg p-4 border border-red-500/30">
-          <p className="text-red-400 text-xs font-semibold mb-2">report_b.sql</p>
-          <pre className="text-gray-400 text-[11px] leading-relaxed whitespace-pre-wrap">{`-- Same joins, copied again
-SELECT c.id, c.name,
-  o.order_id, o.amount, o.order_date,
-  p.product_name
-FROM raw.customers c
-JOIN raw.orders o ON c.id = o.customer_id
-JOIN raw.products p ON o.product_id = p.id
-WHERE c.is_active = true
-  AND o.status != 'cancelled'`}</pre>
-        </div>
-        <p className="text-red-400/70 text-xs text-center">Same join logic duplicated across every script. Change something? Find every copy.</p>
-      </div>
-    )
-  }
-
   return (
-    <div className="space-y-4">
-      {/* DAG */}
-      <div className="bg-gray-900 rounded-lg p-4 border border-emerald-500/30 flex justify-center">
-        <svg width="400" height="170" viewBox="0 0 400 170">
-          {/* Sources row */}
-          <DagNode x={10} y={10} label="stg_orders" />
-          <DagNode x={270} y={10} label="stg_products" />
-          {/* Intermediate */}
-          <DagNode x={140} y={70} label="int_order_items" />
-          {/* Edges to intermediate */}
-          <DagEdge x1={130} y1={26} x2={140} y2={86} />
-          <DagEdge x1={270} y1={26} x2={260} y2={86} />
-          {/* Final models */}
-          <DagNode x={30} y={130} label="fct_order_items" />
-          <DagNode x={250} y={130} label="fct_orders" />
-          {/* Edges from intermediate */}
-          <DagEdge x1={140} y1={102} x2={150} y2={146} />
-          <DagEdge x1={260} y1={102} x2={250} y2={146} />
-          {/* "defined once" label */}
-          <text x={200} y={64} textAnchor="middle" fill="#6ee7b7" fontSize={9} fontStyle="italic">defined once, referenced by both</text>
-        </svg>
-      </div>
-      {/* Code cards */}
-      <div className="grid grid-cols-3 gap-2">
-        <div className="bg-gray-900 rounded-lg p-3 border border-emerald-500/20">
-          <p className="text-emerald-400 text-[10px] font-semibold mb-1">stg_orders.sql</p>
-          <pre className="text-gray-400 text-[10px] leading-snug whitespace-pre-wrap">{`SELECT order_id, customer_id,
-  amount, order_date
-FROM {{ source('raw','orders') }}
-WHERE status != 'cancelled'`}</pre>
-        </div>
-        <div className="bg-gray-900 rounded-lg p-3 border border-emerald-500/20">
-          <p className="text-emerald-400 text-[10px] font-semibold mb-1">int_order_items.sql</p>
-          <pre className="text-gray-400 text-[10px] leading-snug whitespace-pre-wrap">{`SELECT o.*, p.product_name,
-  p.price * o.qty AS total
-FROM {{ ref('stg_orders') }} o
-JOIN {{ ref('stg_products') }} p
-  ON o.product_id = p.id`}</pre>
-        </div>
-        <div className="bg-gray-900 rounded-lg p-3 border border-emerald-500/20">
-          <p className="text-emerald-400 text-[10px] font-semibold mb-1">fct_orders.sql</p>
-          <pre className="text-gray-400 text-[10px] leading-snug whitespace-pre-wrap">{`SELECT customer_id,
-  SUM(total) AS revenue
-FROM {{ ref('int_order_items') }}
-GROUP BY 1`}</pre>
-        </div>
-      </div>
-    </div>
+    <AnimatePresence mode="wait">
+      <motion.div
+        key={showDbt ? 'with' : 'without'}
+        initial={{ opacity: 0, x: showDbt ? 10 : -10 }}
+        animate={{ opacity: 1, x: 0 }}
+        exit={{ opacity: 0, x: showDbt ? -10 : 10 }}
+        transition={{ duration: 0.25 }}
+      >
+        {!showDbt ? (
+          <div className="bg-gray-50 border border-gray-200 rounded-xl p-5 space-y-4">
+            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">The int_order_items logic is embedded and repeated in every downstream script</p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="bg-white border border-gray-200 rounded-lg p-4 font-mono text-[11px] leading-relaxed">
+                <div className="text-red-600 font-bold mb-2">fct_order_items.sql</div>
+                <div className="text-gray-700">
+                  <div><span className="text-blue-600">WITH</span> order_items <span className="text-blue-600">AS</span> (</div>
+                  <div className="text-amber-600 ml-2">-- join logic defined inline</div>
+                  <div className="ml-2"><span className="text-blue-600">SELECT</span> l.*, o.order_date</div>
+                  <div className="ml-2"><span className="text-blue-600">FROM</span> <span className="text-red-600">raw.lineitem</span> l</div>
+                  <div className="ml-2"><span className="text-blue-600">JOIN</span> <span className="text-red-600">raw.orders</span> o</div>
+                  <div className="ml-4"><span className="text-blue-600">ON</span> l.order_key = o.order_key</div>
+                  <div>)</div>
+                  <div><span className="text-blue-600">SELECT</span> * <span className="text-blue-600">FROM</span> order_items;</div>
+                </div>
+              </div>
+              <div className="bg-white border border-gray-200 rounded-lg p-4 font-mono text-[11px] leading-relaxed">
+                <div className="text-red-600 font-bold mb-2">fct_orders.sql</div>
+                <div className="text-gray-700">
+                  <div><span className="text-blue-600">WITH</span> order_items <span className="text-blue-600">AS</span> (</div>
+                  <div className="text-amber-600 ml-2">-- same logic, copied again</div>
+                  <div className="ml-2"><span className="text-blue-600">SELECT</span> l.*, o.order_date</div>
+                  <div className="ml-2"><span className="text-blue-600">FROM</span> <span className="text-red-600">raw.lineitem</span> l</div>
+                  <div className="ml-2"><span className="text-blue-600">JOIN</span> <span className="text-red-600">raw.orders</span> o</div>
+                  <div className="ml-4"><span className="text-blue-600">ON</span> l.order_key = o.order_key</div>
+                  <div>)</div>
+                  <div><span className="text-blue-600">SELECT</span> order_key,</div>
+                  <div className="ml-2"><span className="text-blue-600">SUM</span>(amount) <span className="text-blue-600">AS</span> total</div>
+                  <div><span className="text-blue-600">FROM</span> order_items</div>
+                  <div><span className="text-blue-600">GROUP BY</span> 1;</div>
+                </div>
+              </div>
+            </div>
+            <p className="text-xs text-red-600 font-medium">The join logic is duplicated. Change it in one place and the other silently drifts.</p>
+          </div>
+        ) : (
+          <div className="bg-gray-50 border border-gray-200 rounded-xl p-5 space-y-4">
+            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">int_order_items is defined once and referenced by every downstream model</p>
+
+            {/* Horizontal DAG */}
+            <div className="bg-white border border-gray-200 rounded-lg p-4 flex justify-center">
+              <svg viewBox="0 0 720 140" className="w-full max-w-2xl h-auto" overflow="visible">
+                <defs>
+                  <marker id="mod-arrow" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+                    <path d="M0,0 L0,6 L6,3 z" fill="#9ca3af" />
+                  </marker>
+                </defs>
+                {/* Edges: sources to int */}
+                {[[175,35,270,65],[175,105,270,75]].map(([x1,y1,x2,y2],i) => {
+                  const mx=(x1+x2)/2
+                  return <path key={`a${i}`} d={`M${x1} ${y1} C${mx} ${y1} ${mx} ${y2} ${x2} ${y2}`} stroke="#d1d5db" strokeWidth="1.5" fill="none" markerEnd="url(#mod-arrow)" />
+                })}
+                {/* Edges: int to facts */}
+                {[[430,65,490,35],[430,75,490,105]].map(([x1,y1,x2,y2],i) => {
+                  const mx=(x1+x2)/2
+                  return <path key={`b${i}`} d={`M${x1} ${y1} C${mx} ${y1} ${mx} ${y2} ${x2} ${y2}`} stroke="#d1d5db" strokeWidth="1.5" fill="none" markerEnd="url(#mod-arrow)" />
+                })}
+                {/* Source nodes */}
+                <rect x={10} y={22} width={165} height={28} rx={6} fill="#ecfeff" stroke="#a5f3fc" strokeWidth="1.2" />
+                <text x={17} y={40} fontSize="7" fontWeight="700" fill="#06b6d4" fontFamily="monospace">SRC</text>
+                <text x={40} y={40} fontSize="9" fontWeight="600" fill="#155e75" fontFamily="monospace">tpch_now.lineitem</text>
+                <rect x={10} y={92} width={165} height={28} rx={6} fill="#ecfeff" stroke="#a5f3fc" strokeWidth="1.2" />
+                <text x={17} y={110} fontSize="7" fontWeight="700" fill="#06b6d4" fontFamily="monospace">SRC</text>
+                <text x={40} y={110} fontSize="9" fontWeight="600" fill="#155e75" fontFamily="monospace">tpch_now.orders</text>
+                {/* Staging */}
+                {/* Int node (highlighted) */}
+                <rect x={270} y={50} width={160} height={40} rx={7} fill="#fff7ed" stroke="#f97316" strokeWidth="2.5" />
+                <text x={350} y={75} textAnchor="middle" fontSize="10" fontWeight="700" fill="#9a3412" fontFamily="monospace">int_order_items</text>
+                <text x={350} y={45} textAnchor="middle" fontSize="8" fill="#9ca3af" fontStyle="italic">defined once</text>
+                {/* Fact nodes */}
+                <rect x={490} y={22} width={140} height={28} rx={6} fill="#f9fafb" stroke="#d1d5db" strokeWidth="1.2" />
+                <text x={560} y={40} textAnchor="middle" fontSize="9" fontWeight="600" fill="#374151" fontFamily="monospace">fct_order_items</text>
+                <rect x={490} y={92} width={140} height={28} rx={6} fill="#f9fafb" stroke="#d1d5db" strokeWidth="1.2" />
+                <text x={560} y={110} textAnchor="middle" fontSize="9" fontWeight="600" fill="#374151" fontFamily="monospace">fct_orders</text>
+                {/* Labels */}
+                <text x={92} y={135} textAnchor="middle" fontSize="8" fill="#9ca3af" fontWeight="500">Sources</text>
+                <text x={350} y={135} textAnchor="middle" fontSize="8" fill="#9ca3af" fontWeight="500">Intermediate</text>
+                <text x={560} y={135} textAnchor="middle" fontSize="8" fill="#9ca3af" fontWeight="500">Marts</text>
+              </svg>
+            </div>
+
+            {/* Code cards showing how downstream models just ref the int */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+              <div className="bg-white border-2 border-amber-300 rounded-lg p-3 font-mono text-[10px] leading-relaxed">
+                <div className="text-amber-600 font-bold mb-1">int_order_items.sql</div>
+                <div className="text-gray-700">
+                  <div><span className="text-blue-600">SELECT</span> l.*, o.order_date</div>
+                  <div><span className="text-blue-600">FROM</span> <span className="text-emerald-600">{"{{ ref('stg_line_items') }}"}</span> l</div>
+                  <div><span className="text-blue-600">JOIN</span> <span className="text-emerald-600">{"{{ ref('stg_orders') }}"}</span> o</div>
+                  <div className="ml-2"><span className="text-blue-600">ON</span> l.order_key = o.order_key</div>
+                </div>
+                <div className="text-[9px] text-amber-500 mt-2 font-semibold">defined once</div>
+              </div>
+              <div className="bg-white border border-gray-200 rounded-lg p-3 font-mono text-[10px] leading-relaxed">
+                <div className="text-gray-500 font-bold mb-1">fct_order_items.sql</div>
+                <div className="text-gray-700">
+                  <div><span className="text-blue-600">SELECT</span> *</div>
+                  <div className="bg-emerald-50 -mx-1 px-1 rounded"><span className="text-blue-600">FROM</span> <span className="text-emerald-600 font-bold">{"{{ ref('int_order_items') }}"}</span></div>
+                </div>
+                <div className="text-[9px] text-gray-400 mt-2">just ref() it</div>
+              </div>
+              <div className="bg-white border border-gray-200 rounded-lg p-3 font-mono text-[10px] leading-relaxed">
+                <div className="text-gray-500 font-bold mb-1">fct_orders.sql</div>
+                <div className="text-gray-700">
+                  <div><span className="text-blue-600">SELECT</span> order_key,</div>
+                  <div className="ml-2"><span className="text-blue-600">SUM</span>(amount) <span className="text-blue-600">AS</span> total</div>
+                  <div className="bg-emerald-50 -mx-1 px-1 rounded"><span className="text-blue-600">FROM</span> <span className="text-emerald-600 font-bold">{"{{ ref('int_order_items') }}"}</span></div>
+                  <div><span className="text-blue-600">GROUP BY</span> 1</div>
+                </div>
+                <div className="text-[9px] text-gray-400 mt-2">just ref() it</div>
+              </div>
+            </div>
+            <p className="text-xs text-emerald-700 font-medium">Logic lives in one place. Every downstream model references it. Change it once, everything updates.</p>
+          </div>
+        )}
+      </motion.div>
+    </AnimatePresence>
   )
 }
 
@@ -396,10 +443,10 @@ function DDLVisual({ showDbt }) {
   if (!showDbt) {
     return (
       <div className="space-y-3">
-        <div className="bg-gray-900 rounded-lg p-4 border border-red-500/30">
-          <p className="text-red-400 text-xs font-semibold mb-2">deploy_incremental_orders.sql</p>
-          <pre className="text-gray-400 text-[11px] leading-relaxed whitespace-pre-wrap">{`-- Create target table if it doesn't exist
-CREATE TABLE IF NOT EXISTS analytics.fct_orders (
+        <div className="bg-white border border-gray-200 rounded-lg p-4">
+          <p className="text-red-600 text-xs font-semibold mb-2">deploy_incremental_orders.sql</p>
+          <pre className="text-gray-700 text-[11px] leading-relaxed whitespace-pre-wrap font-mono">{`-- Create target table if it doesn't exist
+`}<span className="text-blue-600">CREATE TABLE IF NOT EXISTS</span>{` analytics.fct_orders (
   order_id    STRING,
   customer_id STRING,
   order_date  DATE,
@@ -409,40 +456,33 @@ CREATE TABLE IF NOT EXISTS analytics.fct_orders (
 );
 
 -- Incremental merge
-MERGE INTO analytics.fct_orders AS target
-USING (
-  SELECT
+`}<span className="text-blue-600">MERGE INTO</span>{` analytics.fct_orders AS target
+`}<span className="text-blue-600">USING</span>{` (
+  `}<span className="text-blue-600">SELECT</span>{`
     o.order_id,
     o.customer_id,
     o.order_date,
     o.amount,
     o.status,
     CURRENT_TIMESTAMP() AS updated_at
-  FROM raw.orders o
-  WHERE o.order_date >= DATEADD(day, -3, CURRENT_DATE)
+  `}<span className="text-blue-600">FROM</span>{` raw.orders o
+  `}<span className="text-blue-600">WHERE</span>{` o.order_date >= DATEADD(day, -3, CURRENT_DATE)
 ) AS source
-ON target.order_id = source.order_id
-WHEN MATCHED THEN UPDATE SET
+`}<span className="text-blue-600">ON</span>{` target.order_id = source.order_id
+`}<span className="text-blue-600">WHEN MATCHED THEN UPDATE SET</span>{`
   target.customer_id = source.customer_id,
   target.order_date  = source.order_date,
   target.amount      = source.amount,
   target.status      = source.status,
   target.updated_at  = source.updated_at
-WHEN NOT MATCHED THEN INSERT (
+`}<span className="text-blue-600">WHEN NOT MATCHED THEN INSERT</span>{` (
   order_id, customer_id, order_date,
   amount, status, updated_at
-) VALUES (
+) `}<span className="text-blue-600">VALUES</span>{` (
   source.order_id, source.customer_id,
   source.order_date, source.amount,
   source.status, source.updated_at
-);
-
--- Also handle:
--- Schema changes (ALTER TABLE ADD COLUMN)
--- Warehouse-specific MERGE syntax
--- Transaction wrapping (BEGIN...COMMIT)
--- GRANT permissions after rebuild
--- Error handling and rollback`}</pre>
+);`}</pre>
         </div>
       </div>
     )
@@ -450,36 +490,37 @@ WHEN NOT MATCHED THEN INSERT (
 
   return (
     <div className="space-y-4">
-      {/* Config block */}
-      <div className="bg-gray-900 rounded-lg p-4 border-2 border-amber-500/60">
-        <p className="text-amber-400 text-xs font-semibold mb-2">Config</p>
-        <pre className="text-amber-300 text-[11px] leading-relaxed whitespace-pre-wrap">{`{{
+      <div className="bg-white border border-gray-200 rounded-lg p-4">
+        <p className="text-gray-500 text-xs font-semibold mb-2">fct_orders.sql</p>
+        <div className="font-mono text-[11px] leading-relaxed">
+          <div className="bg-amber-50 border-l-2 border-amber-400 -ml-2 pl-2 py-1 mb-2">
+            <pre className="text-amber-600 whitespace-pre-wrap">{`{{
   config(
     materialized = 'incremental',
     unique_key   = 'order_id',
     incremental_strategy = 'merge'
   )
 }}`}</pre>
-      </div>
-      {/* Clean SELECT */}
-      <div className="bg-gray-900 rounded-lg p-4 border border-emerald-500/30">
-        <p className="text-emerald-400 text-xs font-semibold mb-2">fct_orders.sql</p>
-        <pre className="text-gray-300 text-[11px] leading-relaxed whitespace-pre-wrap">{`SELECT
-  o.order_id,
-  o.customer_id,
-  o.order_date,
-  o.amount,
-  o.status,
-  CURRENT_TIMESTAMP() AS updated_at
-FROM {{ ref('stg_orders') }} o`}</pre>
-        <div className="mt-2 bg-amber-500/10 border border-amber-500/40 rounded px-3 py-2">
-          <pre className="text-amber-300 text-[11px] leading-relaxed whitespace-pre-wrap">{`{% if is_incremental() %}
+          </div>
+          <div className="text-gray-700">
+            <div><span className="text-blue-600">SELECT</span></div>
+            <div className="ml-2">o.order_id,</div>
+            <div className="ml-2">o.customer_id,</div>
+            <div className="ml-2">o.order_date,</div>
+            <div className="ml-2">o.amount,</div>
+            <div className="ml-2">o.status,</div>
+            <div className="ml-2">CURRENT_TIMESTAMP() <span className="text-blue-600">AS</span> updated_at</div>
+            <div><span className="text-blue-600">FROM</span> <span className="text-emerald-600 font-bold">{"{{ ref('stg_orders') }}"}</span> o</div>
+          </div>
+          <div className="bg-amber-50 border-l-2 border-amber-400 -ml-2 pl-2 py-1 mt-2">
+            <pre className="text-amber-600 whitespace-pre-wrap">{`{% if is_incremental() %}
 WHERE o.order_date >= DATEADD(
   day, -3, CURRENT_DATE
 )
 {% endif %}`}</pre>
+          </div>
         </div>
-        <p className="text-emerald-400/70 text-[10px] mt-3">dbt generates the full MERGE statement, handles schema changes, transactions, and permissions automatically.</p>
+        <p className="text-gray-500 text-[10px] mt-3">dbt generates the full MERGE statement, handles schema changes, transactions, and permissions automatically.</p>
       </div>
     </div>
   )
@@ -493,9 +534,9 @@ function LineageVisual({ showDbt }) {
   if (!showDbt) {
     return (
       <div className="space-y-4">
-        <div className="bg-gray-900 rounded-lg p-4 border border-red-500/30">
-          <p className="text-red-400 text-xs font-semibold mb-3">Where does this column come from?</p>
-          <div className="space-y-2 text-gray-400 text-[11px]">
+        <div className="bg-white border border-gray-200 rounded-lg p-4">
+          <p className="text-red-600 text-xs font-semibold mb-3">Where does this column come from?</p>
+          <div className="space-y-2 text-gray-700 text-[11px]">
             <p>Your documentation:</p>
             <ul className="list-disc list-inside space-y-1 text-gray-500">
               <li>Confluence pages (outdated)</li>
@@ -505,8 +546,8 @@ function LineageVisual({ showDbt }) {
             </ul>
           </div>
         </div>
-        <div className="bg-gray-900 rounded-lg p-4 border border-red-500/30">
-          <p className="text-red-400 text-xs font-semibold mb-3">Impact analysis before changes:</p>
+        <div className="bg-white border border-gray-200 rounded-lg p-4">
+          <p className="text-red-600 text-xs font-semibold mb-3">Impact analysis before changes:</p>
           <div className="space-y-1 text-gray-500 text-[11px]">
             <p>Manually grep through scripts</p>
             <p>Ask around on Slack</p>
@@ -514,8 +555,8 @@ function LineageVisual({ showDbt }) {
             <p>Deploy and hope nothing breaks</p>
           </div>
         </div>
-        <div className="bg-gray-900 rounded-lg p-4 border border-red-500/30">
-          <p className="text-red-400 text-xs font-semibold mb-3">New team member onboarding:</p>
+        <div className="bg-white border border-gray-200 rounded-lg p-4">
+          <p className="text-red-600 text-xs font-semibold mb-3">New team member onboarding:</p>
           <div className="space-y-1 text-gray-500 text-[11px]">
             <p>"Talk to Sarah, she built that"</p>
             <p>"Check the wiki, it might be there"</p>
@@ -529,8 +570,8 @@ function LineageVisual({ showDbt }) {
   return (
     <div className="space-y-4">
       {/* Model lineage DAG */}
-      <div className="bg-gray-900 rounded-lg p-4 border border-emerald-500/30">
-        <p className="text-emerald-400 text-xs font-semibold mb-2">Model Lineage (auto-generated)</p>
+      <div className="bg-white border border-gray-200 rounded-lg p-4">
+        <p className="text-emerald-700 text-xs font-semibold mb-2">Model Lineage (auto-generated)</p>
         <div className="flex justify-center">
           <svg width="420" height="120" viewBox="0 0 420 120">
             {/* Sources */}
@@ -550,29 +591,29 @@ function LineageVisual({ showDbt }) {
         </div>
       </div>
       {/* Column lineage */}
-      <div className="bg-gray-900 rounded-lg p-4 border border-emerald-500/30">
-        <p className="text-emerald-400 text-xs font-semibold mb-2">Column-level Lineage</p>
+      <div className="bg-white border border-gray-200 rounded-lg p-4">
+        <p className="text-emerald-700 text-xs font-semibold mb-2">Column-level Lineage</p>
         <div className="flex items-center justify-center gap-3 text-[10px] font-mono">
-          <div className="bg-indigo-500/10 border border-indigo-500/30 rounded px-3 py-2 text-indigo-300">
+          <div className="bg-indigo-50 border border-indigo-200 rounded px-3 py-2 text-indigo-700">
             <p className="font-semibold mb-1">src_orders</p>
             <p>order_total</p>
           </div>
-          <span className="text-gray-500">-&gt;</span>
-          <div className="bg-emerald-500/10 border border-emerald-500/30 rounded px-3 py-2 text-emerald-300">
+          <span className="text-gray-400">-&gt;</span>
+          <div className="bg-emerald-50 border border-emerald-200 rounded px-3 py-2 text-emerald-700">
             <p className="font-semibold mb-1">stg_orders</p>
             <p>amount</p>
           </div>
-          <span className="text-gray-500">-&gt;</span>
-          <div className="bg-amber-500/10 border border-amber-500/30 rounded px-3 py-2 text-amber-300">
+          <span className="text-gray-400">-&gt;</span>
+          <div className="bg-amber-50 border border-amber-200 rounded px-3 py-2 text-amber-700">
             <p className="font-semibold mb-1">fct_orders</p>
             <p>revenue</p>
           </div>
         </div>
       </div>
       {/* YAML docs */}
-      <div className="bg-gray-900 rounded-lg p-4 border border-emerald-500/30">
-        <p className="text-emerald-400 text-xs font-semibold mb-2">Documentation in YAML (always up to date)</p>
-        <pre className="text-gray-300 text-[11px] leading-relaxed whitespace-pre-wrap">{`models:
+      <div className="bg-white border border-gray-200 rounded-lg p-4">
+        <p className="text-emerald-700 text-xs font-semibold mb-2">Documentation in YAML (always up to date)</p>
+        <pre className="text-gray-700 text-[11px] leading-relaxed whitespace-pre-wrap">{`models:
   - name: fct_orders
     description: "Order-level fact table"
     columns:
@@ -986,6 +1027,12 @@ WHERE status NOT IN (
               {nodeStates[node.key] === 'running' && ' ...'}
             </div>
           ))}
+          {nodeStates.stg_orders === 'fail' && (
+            <div className="bg-red-50 border border-red-200 rounded-lg p-2 mt-2">
+              <p className="text-red-700 text-xs font-semibold">FAIL: unique test on stg_orders.order_id</p>
+              <p className="text-red-700 text-xs mt-0.5">Found 8 duplicate records. Downstream models skipped.</p>
+            </div>
+          )}
         </div>
       </div>
     </div>

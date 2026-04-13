@@ -8,7 +8,7 @@ An interactive educational website that walks through how dbt works, from archit
 
 The guide is organized into four main sections, accessible via tabs at the top:
 
-### 1. dbt Architecture & Setup
+### 1. Architecture & Environments
 - **Full Architecture** overview showing how Git, dbt, and your data platform connect
 - **Git ↔ dbt** bidirectional sync walkthrough (pull, write, push)
 - **dbt → Data Platform** compilation and execution flow with execution plan visualization

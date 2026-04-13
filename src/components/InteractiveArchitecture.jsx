@@ -285,8 +285,8 @@ export default function InteractiveArchitecture() {
                     <p className="font-bold text-gray-900 text-center text-lg mb-1">dbt</p>
                     <p className="text-xs text-gray-500 text-center font-semibold mb-1">Transformation Layer</p>
                     <p className="text-sm text-gray-700 text-center">
-                      Develops code <span className="text-blue-500 font-medium">(git)</span><br />
-                      Creates and orchestrates execution plan <span className="text-green-600 font-medium">(data platform)</span><br />
+                      Develops code<br />
+                      Creates and orchestrates execution plan<br />
                       Metadata management
                     </p>
                   </div>

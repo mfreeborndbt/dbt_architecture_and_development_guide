@@ -16,12 +16,12 @@ export default function HowDbtWorks() {
           </h3>
         </div>
 
-        <div className="bg-gray-950 rounded-xl p-4 font-mono text-[11px] leading-relaxed">
+        <div className="bg-white border border-gray-200 rounded-xl p-4 font-mono text-[11px] leading-relaxed">
           <div className="text-gray-500 text-[10px] mb-2">int_enriched_orders.sql</div>
-          <pre className="text-gray-300">
-<span className="text-blue-400">CREATE OR REPLACE TABLE</span>{` analytics.int_enriched_orders `}<span className="text-blue-400">AS</span>{`
+          <pre className="text-gray-700">
+<span className="text-blue-600">CREATE OR REPLACE TABLE</span>{` analytics.int_enriched_orders `}<span className="text-blue-600">AS</span>{`
 
-`}<span className="text-blue-400">SELECT</span>{`
+`}<span className="text-blue-600">SELECT</span>{`
     o.order_id,
     o.customer_id,
     o.order_date,
@@ -29,16 +29,16 @@ export default function HowDbtWorks() {
     p.product_name,
     p.category,
     p.price
-`}<span className="text-blue-400">FROM</span>{` `}<span className="text-red-400">analytics.stg_orders</span>{` o
-`}<span className="text-blue-400">LEFT JOIN</span>{` `}<span className="text-red-400">analytics.stg_product</span>{` p
-    `}<span className="text-blue-400">ON</span>{` o.product_id = p.product_id`}
+`}<span className="text-blue-600">FROM</span>{` `}<span className="text-red-600">analytics.stg_orders</span>{` o
+`}<span className="text-blue-600">LEFT JOIN</span>{` `}<span className="text-red-600">analytics.stg_product</span>{` p
+    `}<span className="text-blue-600">ON</span>{` o.product_id = p.product_id`}
           </pre>
-          <div className="border-t border-gray-800 mt-3 pt-3 space-y-1">
-            <div className="text-red-400 text-[10px] flex items-start gap-1.5">
+          <div className="border-t border-gray-200 mt-3 pt-3 space-y-1">
+            <div className="text-red-600 text-[10px] flex items-start gap-1.5">
               <span className="mt-0.5">&#x2717;</span>
               <span>Hardcoded table references. If a table name or schema changes, this breaks.</span>
             </div>
-            <div className="text-red-400 text-[10px] flex items-start gap-1.5">
+            <div className="text-red-600 text-[10px] flex items-start gap-1.5">
               <span className="mt-0.5">&#x2717;</span>
               <span>No dependency tracking. The scheduler has no idea this depends on stg_orders and stg_product.</span>
             </div>
@@ -59,12 +59,12 @@ export default function HowDbtWorks() {
           </h3>
         </div>
 
-        <div className="bg-gray-950 rounded-xl p-4 font-mono text-[11px] leading-relaxed">
+        <div className="bg-white border border-gray-200 rounded-xl p-4 font-mono text-[11px] leading-relaxed">
           <div className="text-gray-500 text-[10px] mb-2">models/intermediate/int_enriched_orders.sql</div>
-          <pre className="text-gray-300">
-<span className="text-amber-400">{"{{ config(materialized='table') }}"}</span>{`
+          <pre className="text-gray-700">
+<span className="text-amber-600">{"{{ config(materialized='table') }}"}</span>{`
 
-`}<span className="text-blue-400">SELECT</span>{`
+`}<span className="text-blue-600">SELECT</span>{`
     o.order_id,
     o.customer_id,
     o.order_date,
@@ -72,20 +72,20 @@ export default function HowDbtWorks() {
     p.product_name,
     p.category,
     p.price
-`}<span className="text-blue-400">FROM</span>{` `}<span className="text-emerald-400">{"{{ ref('stg_orders') }}"}</span>{` o
-`}<span className="text-blue-400">LEFT JOIN</span>{` `}<span className="text-emerald-400">{"{{ ref('stg_product') }}"}</span>{` p
-    `}<span className="text-blue-400">ON</span>{` o.product_id = p.product_id`}
+`}<span className="text-blue-600">FROM</span>{` `}<span className="text-emerald-600">{"{{ ref('stg_orders') }}"}</span>{` o
+`}<span className="text-blue-600">LEFT JOIN</span>{` `}<span className="text-emerald-600">{"{{ ref('stg_product') }}"}</span>{` p
+    `}<span className="text-blue-600">ON</span>{` o.product_id = p.product_id`}
           </pre>
-          <div className="border-t border-gray-800 mt-3 pt-3 space-y-1">
-            <div className="text-emerald-400 text-[10px] flex items-start gap-1.5">
+          <div className="border-t border-gray-200 mt-3 pt-3 space-y-1">
+            <div className="text-emerald-600 text-[10px] flex items-start gap-1.5">
               <span className="mt-0.5">&#x2713;</span>
               <span>ref() tells dbt this model depends on stg_orders and stg_product</span>
             </div>
-            <div className="text-emerald-400 text-[10px] flex items-start gap-1.5">
+            <div className="text-emerald-600 text-[10px] flex items-start gap-1.5">
               <span className="mt-0.5">&#x2713;</span>
               <span>dbt resolves the schema and table name at compile time. Works across environments.</span>
             </div>
-            <div className="text-emerald-400 text-[10px] flex items-start gap-1.5">
+            <div className="text-emerald-600 text-[10px] flex items-start gap-1.5">
               <span className="mt-0.5">&#x2713;</span>
               <span>No CREATE TABLE boilerplate. dbt handles materialization.</span>
             </div>

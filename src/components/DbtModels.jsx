@@ -254,37 +254,100 @@ function ModularityVisual({ showDbt }) {
           <div className="bg-gray-50 border border-gray-200 rounded-xl p-5 space-y-4">
             <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">The int_order_items logic is embedded and repeated in every downstream script</p>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="bg-white border border-gray-200 rounded-lg p-4 font-mono text-[11px] leading-relaxed">
-                <div className="text-red-600 font-bold mb-2">fct_order_items.sql</div>
+              <div className="bg-white border border-gray-200 rounded-lg p-4 font-mono text-[11px] leading-relaxed max-h-[320px] overflow-y-auto">
+                <div className="text-red-600 font-bold mb-2 sticky top-0 bg-white pb-1">fct_order_items.sql</div>
                 <div className="text-gray-700">
-                  <div><span className="text-blue-600">WITH</span> order_items <span className="text-blue-600">AS</span> (</div>
-                  <div className="text-amber-600 ml-2">-- join logic defined inline</div>
-                  <div className="ml-2"><span className="text-blue-600">SELECT</span> l.*, o.order_date</div>
-                  <div className="ml-2"><span className="text-blue-600">FROM</span> <span className="text-red-600">raw.lineitem</span> l</div>
-                  <div className="ml-2"><span className="text-blue-600">JOIN</span> <span className="text-red-600">raw.orders</span> o</div>
-                  <div className="ml-4"><span className="text-blue-600">ON</span> l.order_key = o.order_key</div>
-                  <div>)</div>
-                  <div><span className="text-blue-600">SELECT</span> * <span className="text-blue-600">FROM</span> order_items;</div>
+                  <div><span className="text-blue-600">CREATE TABLE</span> analytics.fct_order_items <span className="text-blue-600">AS</span> (</div>
+                  <div className="ml-2"></div>
+                  <div className="bg-red-50 border-l-2 border-red-400 pl-2 py-0.5">
+                    <div><span className="text-blue-600">WITH</span> order_items <span className="text-blue-600">AS</span> (</div>
+                    <div className="ml-2"><span className="text-blue-600">SELECT</span></div>
+                    <div className="ml-4">l.lineitem_key,</div>
+                    <div className="ml-4">l.order_key,</div>
+                    <div className="ml-4">l.part_key,</div>
+                    <div className="ml-4">l.supplier_key,</div>
+                    <div className="ml-4">l.quantity,</div>
+                    <div className="ml-4">l.extended_price,</div>
+                    <div className="ml-4">l.discount,</div>
+                    <div className="ml-4">l.tax,</div>
+                    <div className="ml-4">l.extended_price * (1 - l.discount) <span className="text-blue-600">AS</span> discounted_price,</div>
+                    <div className="ml-4">l.extended_price * (1 - l.discount) * (1 + l.tax) <span className="text-blue-600">AS</span> total_price,</div>
+                    <div className="ml-4">l.ship_date,</div>
+                    <div className="ml-4">l.commit_date,</div>
+                    <div className="ml-4">l.receipt_date,</div>
+                    <div className="ml-4">o.order_date,</div>
+                    <div className="ml-4">o.customer_key,</div>
+                    <div className="ml-4">o.order_priority,</div>
+                    <div className="ml-4">o.status <span className="text-blue-600">AS</span> order_status</div>
+                    <div className="ml-2"><span className="text-blue-600">FROM</span> <span className="text-red-600">raw.lineitem</span> l</div>
+                    <div className="ml-2"><span className="text-blue-600">JOIN</span> <span className="text-red-600">raw.orders</span> o</div>
+                    <div className="ml-4"><span className="text-blue-600">ON</span> l.order_key = o.order_key</div>
+                    <div className="ml-2"><span className="text-blue-600">WHERE</span> o.order_date {'>'} <span className="text-green-700">'2020-01-01'</span></div>
+                    <div>)</div>
+                  </div>
+                  <div className="ml-2"></div>
+                  <div><span className="text-blue-600">SELECT</span></div>
+                  <div className="ml-2">lineitem_key,</div>
+                  <div className="ml-2">order_key,</div>
+                  <div className="ml-2">part_key,</div>
+                  <div className="ml-2">quantity,</div>
+                  <div className="ml-2">discounted_price,</div>
+                  <div className="ml-2">total_price,</div>
+                  <div className="ml-2">order_date,</div>
+                  <div className="ml-2">ship_date</div>
+                  <div><span className="text-blue-600">FROM</span> order_items</div>
+                  <div>);</div>
                 </div>
               </div>
-              <div className="bg-white border border-gray-200 rounded-lg p-4 font-mono text-[11px] leading-relaxed">
-                <div className="text-red-600 font-bold mb-2">fct_orders.sql</div>
+              <div className="bg-white border border-gray-200 rounded-lg p-4 font-mono text-[11px] leading-relaxed max-h-[320px] overflow-y-auto">
+                <div className="text-red-600 font-bold mb-2 sticky top-0 bg-white pb-1">fct_orders.sql</div>
                 <div className="text-gray-700">
-                  <div><span className="text-blue-600">WITH</span> order_items <span className="text-blue-600">AS</span> (</div>
-                  <div className="text-amber-600 ml-2">-- same logic, copied again</div>
-                  <div className="ml-2"><span className="text-blue-600">SELECT</span> l.*, o.order_date</div>
-                  <div className="ml-2"><span className="text-blue-600">FROM</span> <span className="text-red-600">raw.lineitem</span> l</div>
-                  <div className="ml-2"><span className="text-blue-600">JOIN</span> <span className="text-red-600">raw.orders</span> o</div>
-                  <div className="ml-4"><span className="text-blue-600">ON</span> l.order_key = o.order_key</div>
-                  <div>)</div>
-                  <div><span className="text-blue-600">SELECT</span> order_key,</div>
-                  <div className="ml-2"><span className="text-blue-600">SUM</span>(amount) <span className="text-blue-600">AS</span> total</div>
+                  <div><span className="text-blue-600">CREATE TABLE</span> analytics.fct_orders <span className="text-blue-600">AS</span> (</div>
+                  <div className="ml-2"></div>
+                  <div className="bg-red-50 border-l-2 border-red-400 pl-2 py-0.5">
+                    <div><span className="text-blue-600">WITH</span> order_items <span className="text-blue-600">AS</span> (</div>
+                    <div className="ml-2"><span className="text-blue-600">SELECT</span></div>
+                    <div className="ml-4">l.lineitem_key,</div>
+                    <div className="ml-4">l.order_key,</div>
+                    <div className="ml-4">l.part_key,</div>
+                    <div className="ml-4">l.supplier_key,</div>
+                    <div className="ml-4">l.quantity,</div>
+                    <div className="ml-4">l.extended_price,</div>
+                    <div className="ml-4">l.discount,</div>
+                    <div className="ml-4">l.tax,</div>
+                    <div className="ml-4">l.extended_price * (1 - l.discount) <span className="text-blue-600">AS</span> discounted_price,</div>
+                    <div className="ml-4">l.extended_price * (1 - l.discount) * (1 + l.tax) <span className="text-blue-600">AS</span> total_price,</div>
+                    <div className="ml-4">l.ship_date,</div>
+                    <div className="ml-4">l.commit_date,</div>
+                    <div className="ml-4">l.receipt_date,</div>
+                    <div className="ml-4">o.order_date,</div>
+                    <div className="ml-4">o.customer_key,</div>
+                    <div className="ml-4">o.order_priority,</div>
+                    <div className="ml-4">o.status <span className="text-blue-600">AS</span> order_status</div>
+                    <div className="ml-2"><span className="text-blue-600">FROM</span> <span className="text-red-600">raw.lineitem</span> l</div>
+                    <div className="ml-2"><span className="text-blue-600">JOIN</span> <span className="text-red-600">raw.orders</span> o</div>
+                    <div className="ml-4"><span className="text-blue-600">ON</span> l.order_key = o.order_key</div>
+                    <div className="ml-2"><span className="text-blue-600">WHERE</span> o.order_date {'>'} <span className="text-green-700">'2020-01-01'</span></div>
+                    <div>)</div>
+                  </div>
+                  <div className="ml-2"></div>
+                  <div><span className="text-blue-600">SELECT</span></div>
+                  <div className="ml-2">order_key,</div>
+                  <div className="ml-2">customer_key,</div>
+                  <div className="ml-2">order_date,</div>
+                  <div className="ml-2">order_status,</div>
+                  <div className="ml-2">order_priority,</div>
+                  <div className="ml-2"><span className="text-blue-600">COUNT</span>(*) <span className="text-blue-600">AS</span> line_item_count,</div>
+                  <div className="ml-2"><span className="text-blue-600">SUM</span>(quantity) <span className="text-blue-600">AS</span> total_quantity,</div>
+                  <div className="ml-2"><span className="text-blue-600">SUM</span>(discounted_price) <span className="text-blue-600">AS</span> gross_revenue,</div>
+                  <div className="ml-2"><span className="text-blue-600">SUM</span>(total_price) <span className="text-blue-600">AS</span> total_revenue</div>
                   <div><span className="text-blue-600">FROM</span> order_items</div>
-                  <div><span className="text-blue-600">GROUP BY</span> 1;</div>
+                  <div><span className="text-blue-600">GROUP BY</span> 1, 2, 3, 4, 5</div>
+                  <div>);</div>
                 </div>
               </div>
             </div>
-            <p className="text-xs text-red-600 font-medium">The join logic is duplicated. Change it in one place and the other silently drifts.</p>
+            <p className="text-xs text-red-600 font-medium"><span className="inline-block w-3 h-3 bg-red-50 border-l-2 border-red-400 mr-1 align-middle"></span> The highlighted CTE is copy-pasted across both scripts. Change the join, add a filter, or fix a column in one place — the other silently drifts. With dbt, this becomes a single model referenced everywhere.</p>
           </div>
         ) : (
           <div className="bg-gray-50 border border-gray-200 rounded-xl p-5 space-y-4">
@@ -1110,7 +1173,7 @@ WHERE status NOT IN (
 
 export default function DbtModels() {
   const [activeId, setActiveId] = useState('what_is_model')
-  const [showDbt, setShowDbt] = useState(true)
+  const [showDbt, setShowDbt] = useState(false)
   const active = advantages.find(a => a.id === activeId)
 
   const renderCustomVisual = () => {

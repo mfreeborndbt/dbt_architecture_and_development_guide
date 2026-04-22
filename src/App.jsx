@@ -22,11 +22,15 @@ import SettingUpTests from './components/SettingUpTests'
 import DbtBuildSimulator from './components/DbtBuildSimulator'
 import StateAwareOrchestration from './components/StateAwareOrchestration'
 
+// Semantic Layer components
+import SemanticLayer from './components/SemanticLayer'
+
 const topTabs = [
   { key: 'architecture', label: 'Architecture & Environments' },
   { key: 'models', label: 'dbt Models' },
   { key: 'development', label: 'dbt Development Workflow' },
   { key: 'orchestration', label: 'dbt Orchestration' },
+  { key: 'semantic', label: 'dbt Semantic Layer' },
 ]
 
 // Orchestration sub-config
@@ -243,6 +247,7 @@ const tabDescriptions = {
   models: 'What dbt models offer and why they change how you build data pipelines.',
   development: 'The end-to-end workflow from feature branch to production deployment.',
   orchestration: 'How dbt orchestration makes data pipelines simpler, faster, and cheaper.',
+  semantic: 'A governed metrics layer that turns questions into correct SQL for LLMs, apps, and BI.',
 }
 
 export default function App() {
@@ -313,6 +318,11 @@ export default function App() {
         {activeTab === 'orchestration' && (
           <motion.div key="orch" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.3 }}>
             <OrchestrationPage />
+          </motion.div>
+        )}
+        {activeTab === 'semantic' && (
+          <motion.div key="semantic" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.3 }}>
+            <SemanticLayer />
           </motion.div>
         )}
       </AnimatePresence>

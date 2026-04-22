@@ -6,7 +6,7 @@ An interactive educational website that walks through how dbt works, from archit
 
 ## What's Inside
 
-The guide is organized into four main sections, accessible via tabs at the top:
+The guide is organized into five main sections, accessible via tabs at the top:
 
 ### 1. Architecture & Environments
 - **Full Architecture** overview showing how Git, dbt, and your data platform connect
@@ -54,6 +54,23 @@ Three phases with interactive simulators:
 - SAO default (source freshness, reused models)
 - Advanced configuration (update: all blocking behavior)
 
+### 5. dbt Semantic Layer
+A governed metrics layer that turns questions into correct SQL for LLMs, apps, and BI.
+
+**How It Works**
+- Static flow diagram: User Input → dbt Semantic Layer (MetricFlow) → Generated SQL → Results
+- Interactive "Walk Through a Query" animation with step-by-step terminal output
+- Clickable stage highlighting after animation completes
+
+**Problem It Solves**
+- "Without Semantic Layer" vs "With Semantic Layer" toggle
+- Covers: hundreds of tables, inconsistent definitions, LLM complexity
+- With: curated tables, no ambiguity, LLM guardrails
+
+**How It's Configured**
+- 7-step walkthrough: Select Tables (DAG), Define Relationships, Add Dimensions, Define Metrics, Saved Queries (optional), Validate (interactive animation), Code Review & Deploy (visual git flow)
+- Uses the latest dbt Semantic Layer v2.0 spec with syntax-highlighted YAML
+
 ## Tech Stack
 
 - **React 19** with hooks
@@ -81,7 +98,7 @@ Deploys automatically to GitHub Pages on push to `main` via GitHub Actions.
 
 ```
 src/
-  App.jsx                          # Main app with 4 top-level tabs
+  App.jsx                          # Main app with 5 top-level tabs
   components/
     InteractiveArchitecture.jsx    # Architecture diagrams and flows
     EnvironmentsSection.jsx        # Environment configuration cards
@@ -96,4 +113,5 @@ src/
     SettingUpTests.jsx             # YAML test configuration
     DbtBuildSimulator.jsx          # dbt build with test pass/fail
     StateAwareOrchestration.jsx    # SAO scenarios simulator
+    SemanticLayer.jsx              # Semantic Layer section (3 tabs)
 ```

@@ -15,42 +15,33 @@ const tabDescs = {
 
 /* ─── Tab 1: How It Works ─── */
 
-const animStages = ['idle', 'input', 'metricflow', 'sql', 'results', 'done']
-
-// Animation stage descriptions for the terminal
-const stageLabels = {
-  input: 'Submitting query: "What was revenue by region last quarter?"',
-  metricflow: 'MetricFlow resolving metric → revenue, dimension → region, filter → last quarter...',
-  sql: 'Generating SQL from governed definitions...',
-  results: 'Executing query and returning results...',
-  done: 'Complete. Results returned from the Semantic Layer.',
-}
-
-const flowBoxes = [
-  { id: 'input', label: 'User Input', x: 10, w: 170, fill: '#f0fdf4', stroke: '#86efac', titleColor: '#166534' },
-  { id: 'sl', label: 'dbt Semantic Layer', x: 250, w: 180, fill: '#eff6ff', stroke: '#93c5fd', titleColor: '#1e3a5f' },
-  { id: 'sql', label: 'Generated SQL', x: 500, w: 170, fill: '#fefce8', stroke: '#fde68a', titleColor: '#78350f' },
-  { id: 'results', label: 'Results', x: 740, w: 130, fill: '#fdf4ff', stroke: '#e9d5ff', titleColor: '#581c87' },
-]
-
-function FlowDiagram() {
+/* --- Non-AI flow diagram (5 boxes) --- */
+function FlowDiagramNonAI() {
   const [hovered, setHovered] = useState(null)
+  const boxes = [
+    { id: 'input', label: 'User Input', x: 5, w: 140, fill: '#f0fdf4', stroke: '#86efac', titleColor: '#166534' },
+    { id: 'connector', label: 'API / Native Connector', x: 180, w: 145, fill: '#fff7ed', stroke: '#fdba74', titleColor: '#9a3412' },
+    { id: 'sl', label: 'dbt Semantic Layer', x: 360, w: 155, fill: '#eff6ff', stroke: '#93c5fd', titleColor: '#1e3a5f' },
+    { id: 'sql', label: 'Generated SQL', x: 550, w: 145, fill: '#fefce8', stroke: '#fde68a', titleColor: '#78350f' },
+    { id: 'results', label: 'Results', x: 730, w: 110, fill: '#fdf4ff', stroke: '#e9d5ff', titleColor: '#581c87' },
+  ]
   return (
     <div className="bg-gray-50 border border-gray-200 rounded-xl p-6 overflow-x-auto">
-      <svg width="880" height="195" viewBox="0 0 880 195" className="w-full h-auto">
+      <svg width="850" height="195" viewBox="0 0 850 195" className="w-full h-auto">
         <defs>
           <marker id="sl-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth={6} markerHeight={6} orient="auto-start-auto">
             <path d="M 0 0 L 10 5 L 0 10 z" fill="#9ca3af" />
           </marker>
         </defs>
 
-        {/* Arrows */}
-        <line x1={190} y1={90} x2={240} y2={90} stroke="#9ca3af" strokeWidth={1.5} markerEnd="url(#sl-arrow)" />
-        <line x1={440} y1={90} x2={490} y2={90} stroke="#9ca3af" strokeWidth={1.5} markerEnd="url(#sl-arrow)" />
-        <line x1={680} y1={90} x2={730} y2={90} stroke="#9ca3af" strokeWidth={1.5} markerEnd="url(#sl-arrow)" />
+        {/* Arrows between boxes */}
+        <line x1={150} y1={90} x2={175} y2={90} stroke="#9ca3af" strokeWidth={1.5} markerEnd="url(#sl-arrow)" />
+        <line x1={330} y1={90} x2={355} y2={90} stroke="#9ca3af" strokeWidth={1.5} markerEnd="url(#sl-arrow)" />
+        <line x1={520} y1={90} x2={545} y2={90} stroke="#9ca3af" strokeWidth={1.5} markerEnd="url(#sl-arrow)" />
+        <line x1={700} y1={90} x2={725} y2={90} stroke="#9ca3af" strokeWidth={1.5} markerEnd="url(#sl-arrow)" />
 
         {/* Hoverable boxes */}
-        {flowBoxes.map((box) => {
+        {boxes.map((box) => {
           const isH = hovered === box.id
           return (
             <motion.g
@@ -60,36 +51,48 @@ function FlowDiagram() {
             >
               <rect x={box.x} y={30} width={box.w} height={120} rx={12} fill={box.fill} stroke={box.stroke} strokeWidth={isH ? 2.5 : 1.5} />
               {isH && <rect x={box.x - 2} y={28} width={box.w + 4} height={124} rx={14} fill="none" stroke={box.stroke} strokeWidth={2} opacity={0.4} />}
-              <text x={box.x + box.w / 2} y={22} textAnchor="middle" fontSize={11} fontWeight={600} fill={box.titleColor}>{box.label}</text>
-              {/* Transparent hit area for hover */}
+              <text x={box.x + box.w / 2} y={22} textAnchor="middle" fontSize={box.id === 'connector' ? 9.5 : 11} fontWeight={600} fill={box.titleColor}>{box.label}</text>
               <rect x={box.x} y={18} width={box.w} height={135} fill="transparent" style={{ cursor: 'pointer' }}
                 onMouseEnter={() => setHovered(box.id)} onMouseLeave={() => setHovered(null)} />
             </motion.g>
           )
         })}
 
-        {/* User Input content */}
-        <foreignObject x={18} y={42} width={154} height={100} style={{ pointerEvents: 'none' }}>
+        {/* User Input content — Non-AI */}
+        <foreignObject x={13} y={42} width={124} height={100} style={{ pointerEvents: 'none' }}>
           <div xmlns="http://www.w3.org/1999/xhtml" style={{ fontSize: '10px', color: '#374151', lineHeight: '1.4' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '8px' }}>
-              <span style={{ fontSize: '14px' }}>💬</span>
-              <span style={{ fontWeight: 600 }}>LLM / Chat</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '5px', marginBottom: '8px' }}>
+              <span style={{ fontSize: '13px' }}>📋</span>
+              <span style={{ fontWeight: 600 }}>Dropdown</span>
             </div>
-            <div style={{ fontStyle: 'italic', color: '#6b7280', marginBottom: '10px', fontSize: '9px' }}>
-              "What was revenue by region last quarter?"
+            <div style={{ display: 'flex', alignItems: 'center', gap: '5px', marginBottom: '8px' }}>
+              <span style={{ fontSize: '13px' }}>🖱</span>
+              <span style={{ fontWeight: 600 }}>Drag & Drop</span>
             </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <span style={{ fontSize: '14px' }}>📊</span>
-              <span style={{ fontWeight: 600 }}>Spreadsheet / BI</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+              <span style={{ fontSize: '13px' }}>💻</span>
+              <span style={{ fontWeight: 600 }}>Code</span>
             </div>
-            <div style={{ fontStyle: 'italic', color: '#6b7280', fontSize: '9px' }}>
-              Select metric from dropdown
+          </div>
+        </foreignObject>
+
+        {/* API / Native Connector content */}
+        <foreignObject x={188} y={40} width={129} height={104} style={{ pointerEvents: 'none' }}>
+          <div xmlns="http://www.w3.org/1999/xhtml" style={{ fontSize: '9px', color: '#374151', lineHeight: '1.5' }}>
+            <div style={{ textAlign: 'center', marginBottom: '4px' }}>
+              <span style={{ fontFamily: 'ui-monospace, monospace', fontSize: '10px', fontWeight: 700, color: '#9a3412' }}>Converts to SL Query</span>
+            </div>
+            <div style={{ fontFamily: 'ui-monospace, monospace', fontSize: '7.5px', color: '#6b7280', lineHeight: '1.4' }}>
+              <div>--metrics revenue</div>
+              <div>--group-by region</div>
+              <div>--where "order_date</div>
+              <div>&nbsp;&nbsp;&gt;= '2025-10-01'"</div>
             </div>
           </div>
         </foreignObject>
 
         {/* MetricFlow content */}
-        <foreignObject x={258} y={40} width={164} height={104} style={{ pointerEvents: 'none' }}>
+        <foreignObject x={368} y={40} width={139} height={104} style={{ pointerEvents: 'none' }}>
           <div xmlns="http://www.w3.org/1999/xhtml" style={{ fontSize: '10px', color: '#374151', lineHeight: '1.5' }}>
             <div style={{ textAlign: 'center', marginBottom: '6px' }}>
               <span style={{ fontFamily: 'ui-monospace, monospace', fontSize: '11px', fontWeight: 700, color: '#1e40af' }}>MetricFlow</span>
@@ -103,29 +106,29 @@ function FlowDiagram() {
         </foreignObject>
 
         {/* SQL content */}
-        <foreignObject x={508} y={42} width={154} height={100} style={{ pointerEvents: 'none' }}>
-          <div xmlns="http://www.w3.org/1999/xhtml" style={{ fontFamily: 'ui-monospace, monospace', fontSize: '9px', color: '#374151', lineHeight: '1.5' }}>
+        <foreignObject x={558} y={42} width={129} height={100} style={{ pointerEvents: 'none' }}>
+          <div xmlns="http://www.w3.org/1999/xhtml" style={{ fontFamily: 'ui-monospace, monospace', fontSize: '8.5px', color: '#374151', lineHeight: '1.5' }}>
             <span style={{ color: '#2563eb' }}>SELECT</span><br />
             {'  region,'}<br />
-            {'  '}<span style={{ color: '#2563eb' }}>SUM</span>{'(amount)'}<span style={{ color: '#6b7280' }}> as </span>{'revenue'}<br />
+            {'  '}<span style={{ color: '#2563eb' }}>SUM</span>{'(amount)'}<br />
+            {'  '}<span style={{ color: '#6b7280' }}>as</span>{' revenue'}<br />
             <span style={{ color: '#2563eb' }}>FROM</span>{' analytics.'}<br />
             {'  fct_orders'}<br />
-            <span style={{ color: '#2563eb' }}>WHERE</span>{' order_date >= ...'}<br />
             <span style={{ color: '#2563eb' }}>GROUP BY</span>{' region'}
           </div>
         </foreignObject>
 
         {/* Results content */}
-        <foreignObject x={748} y={42} width={114} height={100} style={{ pointerEvents: 'none' }}>
+        <foreignObject x={738} y={42} width={94} height={100} style={{ pointerEvents: 'none' }}>
           <div xmlns="http://www.w3.org/1999/xhtml" style={{ fontSize: '9px', color: '#374151', lineHeight: '1.6' }}>
             <table style={{ width: '100%', borderCollapse: 'collapse' }}>
               <thead>
                 <tr style={{ borderBottom: '1px solid #e9d5ff' }}>
-                  <th style={{ textAlign: 'left', fontWeight: 600, paddingBottom: '3px' }}>Region</th>
-                  <th style={{ textAlign: 'right', fontWeight: 600, paddingBottom: '3px' }}>Revenue</th>
+                  <th style={{ textAlign: 'left', fontWeight: 600, paddingBottom: '3px', fontSize: '8px' }}>Region</th>
+                  <th style={{ textAlign: 'right', fontWeight: 600, paddingBottom: '3px', fontSize: '8px' }}>Rev</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody style={{ fontSize: '8.5px' }}>
                 <tr><td>West</td><td style={{ textAlign: 'right' }}>$2.4M</td></tr>
                 <tr><td>East</td><td style={{ textAlign: 'right' }}>$1.8M</td></tr>
                 <tr><td>Central</td><td style={{ textAlign: 'right' }}>$1.2M</td></tr>
@@ -135,21 +138,181 @@ function FlowDiagram() {
         </foreignObject>
 
         {/* Location labels */}
-        <text x={95} y={170} textAnchor="middle" fontSize={10} fill="#6b7280" fontWeight={600}>Application</text>
+        <text x={75} y={170} textAnchor="middle" fontSize={10} fill="#6b7280" fontWeight={600}>Application</text>
         <text x={340} y={170} textAnchor="middle" fontSize={10} fill="#6b7280" fontWeight={600}>dbt Platform</text>
-        <text x={585} y={170} textAnchor="middle" fontSize={10} fill="#6b7280" fontWeight={600}>Data Platform</text>
-        <text x={805} y={170} textAnchor="middle" fontSize={10} fill="#6b7280" fontWeight={600}>Application</text>
+        <text x={622} y={170} textAnchor="middle" fontSize={10} fill="#6b7280" fontWeight={600}>Data Platform</text>
+        <text x={785} y={170} textAnchor="middle" fontSize={10} fill="#6b7280" fontWeight={600}>Application</text>
+
+        {/* Bracket under Connector + Semantic Layer to show dbt Platform spans both */}
+        <line x1={180} y1={158} x2={520} y2={158} stroke="#d1d5db" strokeWidth={1} />
+        <line x1={180} y1={155} x2={180} y2={158} stroke="#d1d5db" strokeWidth={1} />
+        <line x1={520} y1={155} x2={520} y2={158} stroke="#d1d5db" strokeWidth={1} />
       </svg>
     </div>
   )
 }
 
+/* --- AI flow diagram (5 boxes) --- */
+function FlowDiagramAI() {
+  const [hovered, setHovered] = useState(null)
+  const boxes = [
+    { id: 'input', label: 'User Input', x: 5, w: 140, fill: '#f0fdf4', stroke: '#86efac', titleColor: '#166534' },
+    { id: 'mcp', label: 'MCP Server', x: 180, w: 145, fill: '#fdf2f8', stroke: '#f9a8d4', titleColor: '#9d174d' },
+    { id: 'sl', label: 'dbt Semantic Layer', x: 360, w: 155, fill: '#eff6ff', stroke: '#93c5fd', titleColor: '#1e3a5f' },
+    { id: 'sql', label: 'Generated SQL', x: 550, w: 145, fill: '#fefce8', stroke: '#fde68a', titleColor: '#78350f' },
+    { id: 'results', label: 'Results', x: 730, w: 110, fill: '#fdf4ff', stroke: '#e9d5ff', titleColor: '#581c87' },
+  ]
+  return (
+    <div className="bg-gray-50 border border-gray-200 rounded-xl p-6 overflow-x-auto">
+      <svg width="850" height="195" viewBox="0 0 850 195" className="w-full h-auto">
+        <defs>
+          <marker id="sl-arrow-ai" viewBox="0 0 10 10" refX="8" refY="5" markerWidth={6} markerHeight={6} orient="auto-start-auto">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="#9ca3af" />
+          </marker>
+        </defs>
+
+        {/* Arrows between boxes */}
+        <line x1={150} y1={90} x2={175} y2={90} stroke="#9ca3af" strokeWidth={1.5} markerEnd="url(#sl-arrow-ai)" />
+        <line x1={330} y1={90} x2={355} y2={90} stroke="#9ca3af" strokeWidth={1.5} markerEnd="url(#sl-arrow-ai)" />
+        <line x1={520} y1={90} x2={545} y2={90} stroke="#9ca3af" strokeWidth={1.5} markerEnd="url(#sl-arrow-ai)" />
+        <line x1={700} y1={90} x2={725} y2={90} stroke="#9ca3af" strokeWidth={1.5} markerEnd="url(#sl-arrow-ai)" />
+
+        {/* Hoverable boxes */}
+        {boxes.map((box) => {
+          const isH = hovered === box.id
+          return (
+            <motion.g
+              key={box.id}
+              animate={{ y: isH ? -3 : 0 }}
+              transition={{ type: 'spring', stiffness: 400, damping: 20 }}
+            >
+              <rect x={box.x} y={30} width={box.w} height={120} rx={12} fill={box.fill} stroke={box.stroke} strokeWidth={isH ? 2.5 : 1.5} />
+              {isH && <rect x={box.x - 2} y={28} width={box.w + 4} height={124} rx={14} fill="none" stroke={box.stroke} strokeWidth={2} opacity={0.4} />}
+              <text x={box.x + box.w / 2} y={22} textAnchor="middle" fontSize={11} fontWeight={600} fill={box.titleColor}>{box.label}</text>
+              <rect x={box.x} y={18} width={box.w} height={135} fill="transparent" style={{ cursor: 'pointer' }}
+                onMouseEnter={() => setHovered(box.id)} onMouseLeave={() => setHovered(null)} />
+            </motion.g>
+          )
+        })}
+
+        {/* User Input content — AI */}
+        <foreignObject x={13} y={42} width={124} height={100} style={{ pointerEvents: 'none' }}>
+          <div xmlns="http://www.w3.org/1999/xhtml" style={{ fontSize: '10px', color: '#374151', lineHeight: '1.4' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '5px', marginBottom: '6px' }}>
+              <span style={{ fontSize: '13px' }}>💬</span>
+              <span style={{ fontWeight: 600 }}>LLM / Chat</span>
+            </div>
+            <div style={{ fontStyle: 'italic', color: '#6b7280', fontSize: '9px' }}>
+              "What was revenue by region last quarter?"
+            </div>
+          </div>
+        </foreignObject>
+
+        {/* MCP Server content */}
+        <foreignObject x={188} y={40} width={129} height={104} style={{ pointerEvents: 'none' }}>
+          <div xmlns="http://www.w3.org/1999/xhtml" style={{ fontSize: '9px', color: '#374151', lineHeight: '1.5' }}>
+            <div style={{ textAlign: 'center', marginBottom: '4px' }}>
+              <span style={{ fontFamily: 'ui-monospace, monospace', fontSize: '10px', fontWeight: 700, color: '#9d174d' }}>dbt MCP Server</span>
+            </div>
+            <div style={{ fontSize: '8.5px', color: '#6b7280' }}>
+              <div style={{ marginBottom: '2px' }}>&#x2022; Lists available metrics</div>
+              <div style={{ marginBottom: '2px' }}>&#x2022; Lists dimensions</div>
+              <div>&#x2022; LLM maps text to YML values</div>
+            </div>
+          </div>
+        </foreignObject>
+
+        {/* MetricFlow content */}
+        <foreignObject x={368} y={40} width={139} height={104} style={{ pointerEvents: 'none' }}>
+          <div xmlns="http://www.w3.org/1999/xhtml" style={{ fontSize: '10px', color: '#374151', lineHeight: '1.5' }}>
+            <div style={{ textAlign: 'center', marginBottom: '6px' }}>
+              <span style={{ fontFamily: 'ui-monospace, monospace', fontSize: '11px', fontWeight: 700, color: '#1e40af' }}>MetricFlow</span>
+            </div>
+            <div style={{ fontSize: '9px', color: '#6b7280', textAlign: 'center' }}>
+              Resolves metric definitions,<br />
+              dimensions, filters, and<br />
+              entity relationships
+            </div>
+          </div>
+        </foreignObject>
+
+        {/* SQL content */}
+        <foreignObject x={558} y={42} width={129} height={100} style={{ pointerEvents: 'none' }}>
+          <div xmlns="http://www.w3.org/1999/xhtml" style={{ fontFamily: 'ui-monospace, monospace', fontSize: '8.5px', color: '#374151', lineHeight: '1.5' }}>
+            <span style={{ color: '#2563eb' }}>SELECT</span><br />
+            {'  region,'}<br />
+            {'  '}<span style={{ color: '#2563eb' }}>SUM</span>{'(amount)'}<br />
+            {'  '}<span style={{ color: '#6b7280' }}>as</span>{' revenue'}<br />
+            <span style={{ color: '#2563eb' }}>FROM</span>{' analytics.'}<br />
+            {'  fct_orders'}<br />
+            <span style={{ color: '#2563eb' }}>GROUP BY</span>{' region'}
+          </div>
+        </foreignObject>
+
+        {/* Results content */}
+        <foreignObject x={738} y={42} width={94} height={100} style={{ pointerEvents: 'none' }}>
+          <div xmlns="http://www.w3.org/1999/xhtml" style={{ fontSize: '9px', color: '#374151', lineHeight: '1.6' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+              <thead>
+                <tr style={{ borderBottom: '1px solid #e9d5ff' }}>
+                  <th style={{ textAlign: 'left', fontWeight: 600, paddingBottom: '3px', fontSize: '8px' }}>Region</th>
+                  <th style={{ textAlign: 'right', fontWeight: 600, paddingBottom: '3px', fontSize: '8px' }}>Rev</th>
+                </tr>
+              </thead>
+              <tbody style={{ fontSize: '8.5px' }}>
+                <tr><td>West</td><td style={{ textAlign: 'right' }}>$2.4M</td></tr>
+                <tr><td>East</td><td style={{ textAlign: 'right' }}>$1.8M</td></tr>
+                <tr><td>Central</td><td style={{ textAlign: 'right' }}>$1.2M</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </foreignObject>
+
+        {/* Location labels */}
+        <text x={75} y={170} textAnchor="middle" fontSize={10} fill="#6b7280" fontWeight={600}>Application</text>
+        <text x={340} y={170} textAnchor="middle" fontSize={10} fill="#6b7280" fontWeight={600}>dbt Platform</text>
+        <text x={622} y={170} textAnchor="middle" fontSize={10} fill="#6b7280" fontWeight={600}>Data Platform</text>
+        <text x={785} y={170} textAnchor="middle" fontSize={10} fill="#6b7280" fontWeight={600}>Application</text>
+
+        {/* Bracket under MCP + Semantic Layer to show dbt Platform spans both */}
+        <line x1={180} y1={158} x2={520} y2={158} stroke="#d1d5db" strokeWidth={1} />
+        <line x1={180} y1={155} x2={180} y2={158} stroke="#d1d5db" strokeWidth={1} />
+        <line x1={520} y1={155} x2={520} y2={158} stroke="#d1d5db" strokeWidth={1} />
+      </svg>
+    </div>
+  )
+}
+
+/* --- Animation stages and labels per mode --- */
+const animStagesNonAI = ['idle', 'input', 'connector', 'metricflow', 'sql', 'results', 'done']
+const animStagesAI = ['idle', 'input', 'mcp', 'metricflow', 'sql', 'results', 'done']
+
+const progressStepsNonAI = [
+  { key: 'input', label: 'User Input', color: { bg: '#f0fdf4', border: '#86efac', activeBorder: '#22c55e', text: '#166534' } },
+  { key: 'connector', label: 'API / Connector', color: { bg: '#fff7ed', border: '#fdba74', activeBorder: '#f97316', text: '#9a3412' } },
+  { key: 'metricflow', label: 'MetricFlow', color: { bg: '#eff6ff', border: '#93c5fd', activeBorder: '#3b82f6', text: '#1e3a5f' } },
+  { key: 'sql', label: 'Generate SQL', color: { bg: '#fefce8', border: '#fde68a', activeBorder: '#f59e0b', text: '#78350f' } },
+  { key: 'results', label: 'Results', color: { bg: '#fdf4ff', border: '#e9d5ff', activeBorder: '#a855f7', text: '#581c87' } },
+]
+
+const progressStepsAI = [
+  { key: 'input', label: 'User Input', color: { bg: '#f0fdf4', border: '#86efac', activeBorder: '#22c55e', text: '#166534' } },
+  { key: 'mcp', label: 'MCP Server', color: { bg: '#fdf2f8', border: '#f9a8d4', activeBorder: '#ec4899', text: '#9d174d' } },
+  { key: 'metricflow', label: 'MetricFlow', color: { bg: '#eff6ff', border: '#93c5fd', activeBorder: '#3b82f6', text: '#1e3a5f' } },
+  { key: 'sql', label: 'Generate SQL', color: { bg: '#fefce8', border: '#fde68a', activeBorder: '#f59e0b', text: '#78350f' } },
+  { key: 'results', label: 'Results', color: { bg: '#fdf4ff', border: '#e9d5ff', activeBorder: '#a855f7', text: '#581c87' } },
+]
+
 function HowItWorks() {
+  const [isAI, setIsAI] = useState(true)
   const [stage, setStage] = useState('idle')
   const [terminalLines, setTerminalLines] = useState([])
   const [selectedStage, setSelectedStage] = useState(null)
   const timeoutsRef = useRef([])
   const terminalRef = useRef(null)
+
+  const animStages = isAI ? animStagesAI : animStagesNonAI
+  const progressSteps = isAI ? progressStepsAI : progressStepsNonAI
 
   const addLine = useCallback((line) => {
     setTerminalLines(prev => [...prev, line])
@@ -158,7 +321,7 @@ function HowItWorks() {
     }, 50)
   }, [])
 
-  const runAnimation = useCallback(() => {
+  const runAnimationAI = useCallback(() => {
     timeoutsRef.current.forEach(clearTimeout)
     timeoutsRef.current = []
     setTerminalLines([])
@@ -170,12 +333,204 @@ function HowItWorks() {
     // Stage 1: User input
     const t1 = setTimeout(() => {
       setStage('input')
-      addLine({ text: '$ query_metrics --question "What was revenue by region last quarter?"', type: 'command', s: 'input' })
+      addLine({ text: '$ chat: "What was revenue by region last quarter?"', type: 'command', s: 'input' })
     }, delay)
     timeoutsRef.current.push(t1)
     delay += 1400
 
-    // Stage 2: MetricFlow
+    // Stage 2: MCP Server
+    const t2 = setTimeout(() => {
+      setStage('mcp')
+      addLine({ text: '', type: 'blank' })
+      addLine({ text: 'Querying dbt MCP Server...', type: 'info', s: 'mcp' })
+    }, delay)
+    timeoutsRef.current.push(t2)
+    delay += 600
+
+    const t2b = setTimeout(() => {
+      addLine({ text: '  list_metrics() → [revenue, order_count, customer_count, ...]', type: 'ok', s: 'mcp' })
+    }, delay)
+    timeoutsRef.current.push(t2b)
+    delay += 500
+
+    const t2c = setTimeout(() => {
+      addLine({ text: '  list_dimensions(metric: revenue) → [region, order_date, customer_segment, ...]', type: 'ok', s: 'mcp' })
+    }, delay)
+    timeoutsRef.current.push(t2c)
+    delay += 500
+
+    const t2d = setTimeout(() => {
+      addLine({ text: '', type: 'blank' })
+      addLine({ text: '  LLM mapping: "revenue" → metric: revenue', type: 'ok', s: 'mcp' })
+    }, delay)
+    timeoutsRef.current.push(t2d)
+    delay += 400
+
+    const t2e = setTimeout(() => {
+      addLine({ text: '  LLM mapping: "by region" → group_by: Dimension(\'region\')', type: 'ok', s: 'mcp' })
+    }, delay)
+    timeoutsRef.current.push(t2e)
+    delay += 400
+
+    const t2f = setTimeout(() => {
+      addLine({ text: '  LLM mapping: "last quarter" → filter: TimeDimension(\'order_date\') >= 2025-10-01', type: 'ok', s: 'mcp' })
+    }, delay)
+    timeoutsRef.current.push(t2f)
+    delay += 800
+
+    // Stage 3: MetricFlow
+    const t3 = setTimeout(() => {
+      setStage('metricflow')
+      addLine({ text: '', type: 'blank' })
+      addLine({ text: 'Resolving with MetricFlow...', type: 'info', s: 'metricflow' })
+    }, delay)
+    timeoutsRef.current.push(t3)
+    delay += 600
+
+    const t3b = setTimeout(() => {
+      addLine({ text: '  Metric:    revenue → SUM(amount) WHERE status != \'cancelled\'', type: 'ok', s: 'metricflow' })
+    }, delay)
+    timeoutsRef.current.push(t3b)
+    delay += 400
+
+    const t3c = setTimeout(() => {
+      addLine({ text: '  Dimension: region (categorical, from dim_customers)', type: 'ok', s: 'metricflow' })
+    }, delay)
+    timeoutsRef.current.push(t3c)
+    delay += 400
+
+    const t3d = setTimeout(() => {
+      addLine({ text: '  Filter:    order_date >= 2025-10-01 AND order_date < 2026-01-01', type: 'ok', s: 'metricflow' })
+    }, delay)
+    timeoutsRef.current.push(t3d)
+    delay += 400
+
+    const t3e = setTimeout(() => {
+      addLine({ text: '  Joins:     fct_orders → dim_customers via customer_id', type: 'ok', s: 'metricflow' })
+    }, delay)
+    timeoutsRef.current.push(t3e)
+    delay += 800
+
+    // Stage 4: SQL generation
+    const t4 = setTimeout(() => {
+      setStage('sql')
+      addLine({ text: '', type: 'blank' })
+      addLine({ text: 'Generating SQL...', type: 'info', s: 'sql' })
+    }, delay)
+    timeoutsRef.current.push(t4)
+    delay += 500
+
+    const sqlLines = [
+      '  SELECT',
+      '      c.region,',
+      '      SUM(o.amount) AS revenue',
+      '  FROM analytics.fct_orders o',
+      '  LEFT JOIN analytics.dim_customers c',
+      '      ON o.customer_id = c.customer_id',
+      '  WHERE o.status != \'cancelled\'',
+      '      AND o.order_date >= \'2025-10-01\'',
+      '      AND o.order_date < \'2026-01-01\'',
+      '  GROUP BY c.region',
+      '  ORDER BY revenue DESC',
+    ]
+    sqlLines.forEach((line) => {
+      const t = setTimeout(() => {
+        addLine({ text: line, type: 'sql', s: 'sql' })
+      }, delay)
+      timeoutsRef.current.push(t)
+      delay += 120
+    })
+    delay += 600
+
+    // Stage 5: Results
+    const t5 = setTimeout(() => {
+      setStage('results')
+      addLine({ text: '', type: 'blank' })
+      addLine({ text: 'Executing query...', type: 'info', s: 'results' })
+    }, delay)
+    timeoutsRef.current.push(t5)
+    delay += 800
+
+    const t5b = setTimeout(() => {
+      addLine({ text: '', type: 'blank' })
+      addLine({ text: '  REGION      REVENUE', type: 'header', s: 'results' })
+      addLine({ text: '  ─────────   ──────────', type: 'header', s: 'results' })
+    }, delay)
+    timeoutsRef.current.push(t5b)
+    delay += 300
+
+    const resultRows = [
+      { text: '  West        $2,412,000', type: 'result', s: 'results' },
+      { text: '  East        $1,845,000', type: 'result', s: 'results' },
+      { text: '  Central     $1,203,000', type: 'result', s: 'results' },
+    ]
+    resultRows.forEach((row) => {
+      const t = setTimeout(() => { addLine(row) }, delay)
+      timeoutsRef.current.push(t)
+      delay += 250
+    })
+    delay += 400
+
+    // Done
+    const t6 = setTimeout(() => {
+      setStage('done')
+      addLine({ text: '', type: 'blank' })
+      addLine({ text: '3 rows returned.', type: 'success' })
+    }, delay)
+    timeoutsRef.current.push(t6)
+  }, [addLine])
+
+  const runAnimationNonAI = useCallback(() => {
+    timeoutsRef.current.forEach(clearTimeout)
+    timeoutsRef.current = []
+    setTerminalLines([])
+    setStage('idle')
+    setSelectedStage(null)
+
+    let delay = 200
+
+    // Stage 1: User input (dropdown / code selection)
+    const t1 = setTimeout(() => {
+      setStage('input')
+      addLine({ text: 'User selects: metric = revenue, group by = region, filter = last quarter', type: 'command', s: 'input' })
+    }, delay)
+    timeoutsRef.current.push(t1)
+    delay += 1400
+
+    // Stage 2: API / Native Connector
+    const t1b = setTimeout(() => {
+      setStage('connector')
+      addLine({ text: '', type: 'blank' })
+      addLine({ text: 'API / Native Connector converting to SL query syntax...', type: 'info', s: 'connector' })
+    }, delay)
+    timeoutsRef.current.push(t1b)
+    delay += 600
+
+    const t1c = setTimeout(() => {
+      addLine({ text: '$ dbt sl query \\', type: 'ok', s: 'connector' })
+    }, delay)
+    timeoutsRef.current.push(t1c)
+    delay += 300
+
+    const t1d = setTimeout(() => {
+      addLine({ text: '    --metrics revenue \\', type: 'ok', s: 'connector' })
+    }, delay)
+    timeoutsRef.current.push(t1d)
+    delay += 300
+
+    const t1e = setTimeout(() => {
+      addLine({ text: '    --group-by region \\', type: 'ok', s: 'connector' })
+    }, delay)
+    timeoutsRef.current.push(t1e)
+    delay += 300
+
+    const t1f = setTimeout(() => {
+      addLine({ text: '    --where "order_date >= \'2025-10-01\'"', type: 'ok', s: 'connector' })
+    }, delay)
+    timeoutsRef.current.push(t1f)
+    delay += 800
+
+    // Stage 3: MetricFlow
     const t2 = setTimeout(() => {
       setStage('metricflow')
       addLine({ text: '', type: 'blank' })
@@ -277,9 +632,21 @@ function HowItWorks() {
     timeoutsRef.current.push(t5)
   }, [addLine])
 
+  const runAnimation = isAI ? runAnimationAI : runAnimationNonAI
+
+  // Reset state when toggling modes
+  const handleToggle = (newIsAI) => {
+    if (newIsAI === isAI) return
+    timeoutsRef.current.forEach(clearTimeout)
+    timeoutsRef.current = []
+    setIsAI(newIsAI)
+    setStage('idle')
+    setTerminalLines([])
+    setSelectedStage(null)
+  }
+
   const isRunning = stage !== 'idle' && stage !== 'done'
 
-  // Which stages are active/complete for visual highlighting
   const stageIdx = animStages.indexOf(stage)
   const getStageState = (s) => {
     const idx = animStages.indexOf(s)
@@ -305,10 +672,52 @@ function HowItWorks() {
     return 0.4
   }
 
+  // Color mapping for terminal line highlighting
+  const stageHighlightBg = {
+    input: 'bg-green-50',
+    connector: 'bg-orange-50',
+    mcp: 'bg-pink-50',
+    metricflow: 'bg-blue-50',
+    sql: 'bg-amber-50',
+    results: 'bg-purple-50',
+  }
+
   return (
     <div className="space-y-6">
+      {/* AI / Non-AI toggle */}
+      <div className="flex justify-center">
+        <div className="inline-flex bg-gray-100 rounded-xl p-1">
+          <button
+            onClick={() => handleToggle(false)}
+            className={`px-5 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+              !isAI ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'
+            }`}
+          >
+            Non-AI Workflow
+          </button>
+          <button
+            onClick={() => handleToggle(true)}
+            className={`px-5 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+              isAI ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'
+            }`}
+          >
+            AI Workflow
+          </button>
+        </div>
+      </div>
+
       {/* Static flow diagram */}
-      <FlowDiagram />
+      <AnimatePresence mode="wait">
+        {isAI ? (
+          <motion.div key="ai-flow" initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }} transition={{ duration: 0.3 }}>
+            <FlowDiagramAI />
+          </motion.div>
+        ) : (
+          <motion.div key="nonai-flow" initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }} transition={{ duration: 0.3 }}>
+            <FlowDiagramNonAI />
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Interactive animation */}
       <div>
@@ -331,14 +740,9 @@ function HowItWorks() {
           </button>
         </div>
 
-        {/* 4-stage progress indicator */}
-        <div className="grid grid-cols-4 gap-3 mb-4">
-          {[
-            { key: 'input', label: 'User Input', color: { bg: '#f0fdf4', border: '#86efac', activeBorder: '#22c55e', text: '#166534' } },
-            { key: 'metricflow', label: 'MetricFlow', color: { bg: '#eff6ff', border: '#93c5fd', activeBorder: '#3b82f6', text: '#1e3a5f' } },
-            { key: 'sql', label: 'Generate SQL', color: { bg: '#fefce8', border: '#fde68a', activeBorder: '#f59e0b', text: '#78350f' } },
-            { key: 'results', label: 'Results', color: { bg: '#fdf4ff', border: '#e9d5ff', activeBorder: '#a855f7', text: '#581c87' } },
-          ].map((s) => {
+        {/* Progress indicator */}
+        <div className={`grid gap-3 mb-4`} style={{ gridTemplateColumns: `repeat(${progressSteps.length}, minmax(0, 1fr))` }}>
+          {progressSteps.map((s) => {
             const st = getStageState(s.key)
             const isActive = st === 'active'
             const isDone = st === 'done'
@@ -399,24 +803,20 @@ function HowItWorks() {
             {terminalLines.map((line, i) => {
               const isHighlighted = selectedStage && line.s === selectedStage
               const isDimmed = selectedStage && line.s && line.s !== selectedStage
-              // Color-coordinate text by stage
               const stageTextClass =
                 line.type === 'command' ? 'text-emerald-700 font-bold' :
                 line.type === 'success' ? 'text-emerald-700 font-bold' :
                 line.type === 'blank' ? '' :
                 line.s === 'input' ? 'text-green-700 font-bold' :
+                line.s === 'connector' ? (line.type === 'info' ? 'text-orange-400' : 'text-orange-600') :
+                line.s === 'mcp' ? (line.type === 'info' ? 'text-pink-400' : 'text-pink-600') :
                 line.s === 'metricflow' ? (line.type === 'info' ? 'text-blue-400' : 'text-blue-600') :
                 line.s === 'sql' ? (line.type === 'info' ? 'text-amber-400' : 'text-amber-700') :
                 line.s === 'results' ? (line.type === 'info' ? 'text-purple-400' : line.type === 'header' ? 'text-purple-500 font-semibold' : 'text-purple-700 font-medium') :
                 line.type === 'info' ? 'text-gray-400' :
                 ''
-              // Highlight background for selected stage
               const bgClass = isHighlighted ? (
-                line.s === 'input' ? 'bg-green-50 -mx-2 px-2 rounded' :
-                line.s === 'metricflow' ? 'bg-blue-50 -mx-2 px-2 rounded' :
-                line.s === 'sql' ? 'bg-amber-50 -mx-2 px-2 rounded' :
-                line.s === 'results' ? 'bg-purple-50 -mx-2 px-2 rounded' :
-                ''
+                `${stageHighlightBg[line.s] || ''} -mx-2 px-2 rounded`
               ) : ''
               return (
                 <motion.div
